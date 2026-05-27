@@ -108,6 +108,26 @@ async def search_candidates(query: QuerySpec):
     except Exception as e:
         logger.error(f"Search error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/resolve-entities")
+async def resolve_entities():
+    """KG'deki duplicate düğümleri birleştirir (Entity Resolution)"""
+    try:
+        from app.extraction.entity_resolver import EntityResolver
+        resolver = EntityResolver(get_neo4j_driver())
+        stats = resolver.resolve_all()
+        return {"status": "success", "merged": stats}
+    except Exception as e:
+        logger.error(f"ER error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+@app.post("/embed-all")
+async def embed_all():
+    """Tüm adaylar için embedding üret"""
+    from app.extraction.embedding_service import EmbeddingService
+    svc = EmbeddingService(get_neo4j_driver())
+    svc.ensure_vector_index()
+    count = svc.embed_all_candidates()
+    return {"status": "success", "embedded": count}
 
 if __name__ == "__main__":
     import uvicorn

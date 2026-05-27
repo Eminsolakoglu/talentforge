@@ -45,7 +45,8 @@ def _build_client():
             OpenAI(
                 base_url="https://router.huggingface.co/v1",
                 api_key=hf_token,
-            )
+            ),
+            mode=instructor.Mode.JSON,  # ← bunu ekle
         )
         return client, model, "HuggingFace"
 

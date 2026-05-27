@@ -19,6 +19,7 @@ from typing import List, Dict, Any, Optional, Tuple
 import logging
 from neo4j import Driver
 from app.schemas.query import QuerySpec, Seniority, Degree
+from app.extraction.embedding_service import EmbeddingService, generate_embedding, build_candidate_summary
 
 logger = logging.getLogger(__name__)
 
@@ -75,16 +76,13 @@ class CandidateMatcher:
         self.driver = driver
 
     def search(self, query: QuerySpec, limit: int = 10) -> List[Dict[str, Any]]:
-        """
-        Adayları çok kriterli skorlama ile bulur ve sıralar.
-        Her aday için skor kırılımı ve açıklama (reasons) döner.
-        """
         candidates = self._fetch_candidates()
 
         if not candidates:
             logger.warning("⚠️ KG'de aday bulunamadı")
             return []
 
+        # 1. Graf tabanlı skorlama
         scored = []
         for candidate in candidates:
             result = self._score_candidate(candidate, query)
@@ -92,6 +90,22 @@ class CandidateMatcher:
                 scored.append(result)
 
         scored.sort(key=lambda x: x["total_score"], reverse=True)
+        graph_ranked = {c["name"]: i for i, c in enumerate(scored)}
+
+        # 2. Vektör arama (free_text veya skill listesinden)
+        vector_ranked = {}
+        query_text = self._build_query_text(query)
+        if query_text:
+            try:
+                embedding_svc = EmbeddingService(self.driver)
+                vector_results = embedding_svc.vector_search(query_text, top_k=20)
+                vector_ranked = {r["name"]: i for i, r in enumerate(vector_results)}
+            except Exception as e:
+                logger.warning(f"⚠️ Vektör arama başarısız: {e}")
+
+        # 3. RRF birleştirme
+        if vector_ranked:
+            scored = self._rrf_merge(scored, graph_ranked, vector_ranked)
 
         logger.info(f"🔍 {len(scored)}/{len(candidates)} aday eşleşti")
         return scored[:limit]
@@ -475,3 +489,35 @@ class CandidateMatcher:
         if matched:
             return score, f"Sertifikalar: ✓ {', '.join(matched)}"
         return score, f"Sertifikalar: eksik [{', '.join(required_certs)}]"
+    
+    def _build_query_text(self, query: QuerySpec) -> str:
+        parts = []
+        if query.title:
+            parts.append(query.title)
+        if query.must_have_skills:
+            parts.append(", ".join(query.must_have_skills))
+        if query.nice_to_have_skills:
+            parts.append(", ".join(query.nice_to_have_skills))
+        if query.free_text:
+            parts.append(query.free_text)
+        return ". ".join(parts)
+
+    def _rrf_merge(self, scored: List[Dict], graph_ranked: Dict, vector_ranked: Dict, k: int = 60) -> List[Dict]:
+        """Reciprocal Rank Fusion — graf ve vektör sıralamalarını birleştirir"""
+        rrf_scores = {}
+        for name, rank in graph_ranked.items():
+            rrf_scores[name] = rrf_scores.get(name, 0) + 1.0 / (k + rank)
+        for name, rank in vector_ranked.items():
+            rrf_scores[name] = rrf_scores.get(name, 0) + 1.0 / (k + rank)
+
+        # Orijinal skorları RRF ile ağırlıkla
+        for candidate in scored:
+            name = candidate["name"]
+            rrf = rrf_scores.get(name, 0)
+            graph_score = candidate["total_score"]
+            # %70 graf, %30 vektör
+            candidate["total_score"] = round(graph_score * 0.7 + rrf * 3000 * 0.3, 1)
+            candidate["score_breakdown"]["vector_rrf"] = round(rrf * 3000, 1)
+
+        scored.sort(key=lambda x: x["total_score"], reverse=True)
+        return scored
