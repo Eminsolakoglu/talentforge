@@ -174,6 +174,37 @@ async def embed_all():
     except Exception as e:
         logger.error(f"Embed error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+_nl_parser = None
+
+def get_nl_parser():
+    global _nl_parser
+    if _nl_parser is None:
+        from app.query.nl_parser import NLQueryParser
+        _nl_parser = NLQueryParser()
+    return _nl_parser
+
+@app.post("/nl-search")
+async def nl_search(body: dict):
+    """
+    Doğal dil sorgusu → QuerySpec → Aday arama
+    Body: {"query": "5 yıl Python deneyimi olan senior backend developer"}
+    """
+    nl_text = body.get("query", "").strip()
+    if not nl_text:
+        raise HTTPException(status_code=400, detail="query alanı boş olamaz")
+
+    try:
+        query_spec = get_nl_parser().parse(nl_text)
+        results = matcher.search(query_spec, limit=10)
+        return {
+            "parsed_query": query_spec.model_dump(),
+            "results": results,
+        }
+    except Exception as e:
+        logger.error(f"NL search error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

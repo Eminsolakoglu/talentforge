@@ -69,6 +69,23 @@ def _normalize_turkish(text: str) -> str:
 
 # ── Ana sınıf ─────────────────────────────────────────────────────────
 
+def _skill_matches(query_skill: str, candidate_skills: set[str]) -> bool:
+    """Match exact, contained, or fuzzy skill names after normalization."""
+    skill_norm = _normalize_turkish(query_skill)
+
+    if skill_norm in candidate_skills:
+        return True
+
+    if any(skill_norm in cand_skill or cand_skill in skill_norm for cand_skill in candidate_skills):
+        return True
+
+    try:
+        from rapidfuzz import fuzz
+        return any(fuzz.ratio(skill_norm, cand_skill) > 75 for cand_skill in candidate_skills)
+    except Exception:
+        return False
+
+
 class CandidateMatcher:
     """İK sorgusuna göre adayları çok kriterli skorlama ile bulan matcher."""
 
@@ -86,8 +103,7 @@ class CandidateMatcher:
         scored = []
         for candidate in candidates:
             result = self._score_candidate(candidate, query)
-            if result["total_score"] > 0:
-                scored.append(result)
+            scored.append(result)
 
         scored.sort(key=lambda x: x["total_score"], reverse=True)
         graph_ranked = {c["name"]: i for i, c in enumerate(scored)}
@@ -107,6 +123,13 @@ class CandidateMatcher:
         if vector_ranked:
             scored = self._rrf_merge(scored, graph_ranked, vector_ranked)
 
+        scored = [
+            candidate for candidate in scored
+            if candidate["total_score"] >= 25 and not candidate.get("_hard_gate_failed")
+        ]
+        for candidate in scored:
+            candidate.pop("_hard_gate_failed", None)
+
         logger.info(f"🔍 {len(scored)}/{len(candidates)} aday eşleşti")
         return scored[:limit]
 
@@ -125,7 +148,8 @@ class CandidateMatcher:
                     years: hs.years_experience,
                     level: hs.level,
                     confidence: hs.confidence
-                }) AS skills
+                }) AS raw_skills
+                WITH c, [x IN raw_skills WHERE x.name IS NOT NULL] AS skills
 
                 OPTIONAL MATCH (c)-[:HAS_EXPERIENCE]->(e:Experience)-[:AT_COMPANY]->(co:Company)
                 WITH c, skills, collect({
@@ -158,6 +182,7 @@ class CandidateMatcher:
                     c.phone AS phone,
                     c.location AS location,
                     c.summary AS summary,
+                    c.id AS id,
                     skills,
                     experiences,
                     educations,
@@ -169,40 +194,108 @@ class CandidateMatcher:
     # ── Ana skorlama ──────────────────────────────────────────────────
 
     def _score_candidate(self, candidate: Dict, query: QuerySpec) -> Dict[str, Any]:
-        """Her kriter için ayrı skor hesaplar ve birleştirir"""
-        scores = {}
+        """
+        Score only criteria that the user actually supplied.
+
+        Empty filters do not award points. The weighted score is normalized by
+        the active criteria weight, so a small query and a detailed query both
+        produce an interpretable 0-100 score.
+        """
+        weights = {
+            "must_skills": 0.30,
+            "nice_skills": 0.10,
+            "seniority": 0.15,
+            "title": 0.10,
+            "experience": 0.10,
+            "education": 0.08,
+            "location": 0.07,
+            "languages": 0.05,
+            "certifications": 0.05,
+        }
+
+        active_criteria = []
         reasons = []
 
-        criteria = [
-            ("must_skills",    0.30, self._score_must_skills(candidate, query.must_have_skills)),
-            ("nice_skills",    0.10, self._score_nice_skills(candidate, query.nice_to_have_skills)),
-            ("seniority",      0.15, self._score_seniority(candidate, query.seniority)),
-            ("title",          0.10, self._score_title(candidate, query.title)),
-            ("experience",     0.10, self._score_experience_years(candidate, query.min_experience_years)),
-            ("education",      0.08, self._score_education(candidate, query.education_level)),
-            ("location",       0.07, self._score_location(candidate, query.locations)),
-            ("languages",      0.05, self._score_languages(candidate, query.languages)),
-            ("certifications", 0.05, self._score_certifications(candidate, query.must_have_certifications)),
-        ]
-
-        for name, weight, (score, detail) in criteria:
-            scores[name] = score * weight
+        def add_criterion(name: str, score_detail: Tuple[float, str]) -> None:
+            score, detail = score_detail
+            active_criteria.append((name, weights[name], score))
             if detail:
                 reasons.append(detail)
 
-        total = sum(scores.values())
+        if query.must_have_skills:
+            add_criterion("must_skills", self._score_must_skills(candidate, query.must_have_skills))
+
+        if query.nice_to_have_skills:
+            add_criterion("nice_skills", self._score_nice_skills(candidate, query.nice_to_have_skills))
+
+        if query.seniority:
+            add_criterion("seniority", self._score_seniority(candidate, query.seniority))
+
+        if query.title:
+            add_criterion("title", self._score_title(candidate, query.title))
+
+        if query.min_experience_years and query.min_experience_years > 0:
+            add_criterion(
+                "experience",
+                self._score_experience_years(candidate, query.min_experience_years),
+            )
+
+        if query.education_level:
+            add_criterion("education", self._score_education(candidate, query.education_level))
+
+        if query.locations:
+            add_criterion("location", self._score_location(candidate, query.locations))
+
+        if query.languages:
+            add_criterion("languages", self._score_languages(candidate, query.languages))
+
+        if query.must_have_certifications:
+            add_criterion(
+                "certifications",
+                self._score_certifications(candidate, query.must_have_certifications),
+            )
+
+        if active_criteria:
+            active_weight = sum(weight for _, weight, _ in active_criteria)
+            weighted_sum = sum(score * weight for _, weight, score in active_criteria)
+            total = (weighted_sum / active_weight) * 100
+            score_breakdown = {
+                name: round((score * weight / active_weight) * 100, 1)
+                for name, weight, score in active_criteria
+            }
+        else:
+            total = 50.0
+            score_breakdown = {"baseline": 50.0}
+
+        must_score = next(
+            (score for name, _, score in active_criteria if name == "must_skills"),
+            None,
+        )
+        if must_score == 0:
+            total = 0.0
+            score_breakdown["must_have_gate"] = 0.0
+            hard_gate_failed = True
+        elif must_score is not None and must_score < 0.30:
+            total *= must_score
+            score_breakdown["must_have_gate"] = round(must_score * 100, 1)
+            hard_gate_failed = False
+        else:
+            hard_gate_failed = False
+
         skill_names = [s["name"] for s in candidate["skills"] if s.get("name")]
 
         return {
             "name": candidate["name"],
             "email": candidate["email"],
+            "candidate_id": candidate.get("id"),
             "location": candidate["location"],
             "summary": candidate.get("summary"),
             "skills": skill_names,
             "experience_count": len(candidate["experiences"]),
-            "total_score": round(total * 100, 1),
-            "score_breakdown": {k: round(v * 100, 1) for k, v in scores.items()},
+            "total_score": round(total, 1),
+            "score_breakdown": score_breakdown,
             "reasons": reasons,
+            "_hard_gate_failed": hard_gate_failed,
         }
 
     # ── Kriter fonksiyonları ──────────────────────────────────────────
@@ -213,8 +306,9 @@ class CandidateMatcher:
             return 1.0, None
 
         cand_skills = {_normalize_turkish(s["name"]) for s in candidate["skills"] if s.get("name")}
-        matched = [s for s in must_skills if _normalize_turkish(s) in cand_skills]
-        missing = [s for s in must_skills if _normalize_turkish(s) not in cand_skills]
+        matched = [skill for skill in must_skills if _skill_matches(skill, cand_skills)]
+        matched_set = set(matched)
+        missing = [skill for skill in must_skills if skill not in matched_set]
 
         score = len(matched) / len(must_skills)
         detail = f"Zorunlu yetenekler: {len(matched)}/{len(must_skills)}"
@@ -230,7 +324,7 @@ class CandidateMatcher:
             return 1.0, None
 
         cand_skills = {_normalize_turkish(s["name"]) for s in candidate["skills"] if s.get("name")}
-        matched = [s for s in nice_skills if _normalize_turkish(s) in cand_skills]
+        matched = [skill for skill in nice_skills if _skill_matches(skill, cand_skills)]
         score = len(matched) / len(nice_skills)
 
         if matched:
