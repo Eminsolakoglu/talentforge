@@ -33,7 +33,6 @@ env/
 
 # Poetry & uv
 poetry.lock
-uv.lock
 .pdm.toml
 .pdm-python
 .ruff_cache/

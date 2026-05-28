@@ -1,0 +1,16 @@
+.git
+.idea
+.venv
+.uv-cache
+__pycache__
+*.pyc
+.env
+.env.*
+!.env.example
+.ruff_cache
+.mypy_cache
+.pytest_cache
+neo4j/data
+neo4j/logs
+neo4j/import
+docker-compose.override.yml
