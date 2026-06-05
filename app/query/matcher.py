@@ -92,7 +92,13 @@ class CandidateMatcher:
     def __init__(self, driver: Driver):
         self.driver = driver
 
-    def search(self, query: QuerySpec, limit: int = 10) -> List[Dict[str, Any]]:
+    def search(
+        self,
+        query: QuerySpec,
+        limit: int = 10,
+        min_score: float = 25.0,
+        apply_hard_gate: bool = True,
+    ) -> List[Dict[str, Any]]:
         candidates = self._fetch_candidates()
 
         if not candidates:
@@ -125,7 +131,8 @@ class CandidateMatcher:
 
         scored = [
             candidate for candidate in scored
-            if candidate["total_score"] >= 25 and not candidate.get("_hard_gate_failed")
+            if candidate["total_score"] >= min_score
+            and (not apply_hard_gate or not candidate.get("_hard_gate_failed"))
         ]
         for candidate in scored:
             candidate.pop("_hard_gate_failed", None)

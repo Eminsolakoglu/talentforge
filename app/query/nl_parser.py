@@ -18,6 +18,7 @@ Aynı LLM backend'i kullanır (HF/Groq).
 
 import logging
 import os
+import re
 import instructor
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -25,6 +26,31 @@ from app.schemas.query import QuerySpec
 
 load_dotenv()
 logger = logging.getLogger(__name__)
+
+TITLE_PATTERNS = [
+    (r"\bml\s*/?\s*ai\s+engineer\b|\bmachine learning engineer\b", "ML AI Engineer"),
+    (r"\bdevops\b|\bcloud engineer\b", "DevOps Cloud Engineer"),
+    (r"\bdata engineer\b|\bveri mühendis", "Data Engineer"),
+    (r"\bdata analyst\b|\bveri analist", "Data Analyst"),
+    (r"\bbackend\b", "Backend Developer"),
+    (r"\bfrontend\b", "Frontend Developer"),
+    (r"\bmobile\b|\bflutter\b|\bandroid\b|\bios\b", "Mobile Developer"),
+    (r"\bcybersecurity\b|\bsiber güvenlik\b", "Cybersecurity Specialist"),
+    (r"\bqa\b|\btest engineer\b", "QA Engineer"),
+    (r"\bproduct manager\b|\bürün yönetic", "Product Manager"),
+    (r"\bui\s*/?\s*ux\b|\bdesigner\b|\btasarım", "UI/UX Designer"),
+    (r"\bbusiness analyst\b|\biş analist", "Business Analyst"),
+]
+
+
+def _apply_deterministic_fallbacks(query_spec: QuerySpec, nl_text: str) -> QuerySpec:
+    if not query_spec.title:
+        text = nl_text.lower()
+        for pattern, title in TITLE_PATTERNS:
+            if re.search(pattern, text):
+                query_spec.title = title
+                break
+    return query_spec
 
 NL_SYSTEM_PROMPT = """\
 Sen bir İK (İnsan Kaynakları) uzmanısın. Verilen iş ilanı veya arama metnini
@@ -84,19 +110,35 @@ Agile metodoloji şart. İngilizce B2 seviye gerekli. Remote çalışma mümkün
 
 
 def _build_client():
+    preferred_backend = os.getenv("LLM_BACKEND", "").lower().strip()
     groq_key = os.getenv("GROQ_API_KEY")
     hf_token = os.getenv("HF_TOKEN")
+
+    if preferred_backend in {"hf", "huggingface"}:
+        if not hf_token:
+            raise ValueError("LLM_BACKEND=huggingface secildi ama HF_TOKEN bulunamadi")
+        return instructor.from_openai(
+            OpenAI(base_url="https://router.huggingface.co/v1", api_key=hf_token),
+            mode=instructor.Mode.JSON,
+        ), os.getenv("LLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
+
+    if preferred_backend == "groq":
+        if not groq_key:
+            raise ValueError("LLM_BACKEND=groq secildi ama GROQ_API_KEY bulunamadi")
+        return instructor.from_openai(
+            OpenAI(base_url="https://api.groq.com/openai/v1", api_key=groq_key),
+        ), os.getenv("LLM_MODEL", "llama-3.1-8b-instant")
+
+    if hf_token:
+        return instructor.from_openai(
+            OpenAI(base_url="https://router.huggingface.co/v1", api_key=hf_token),
+            mode=instructor.Mode.JSON,
+        ), os.getenv("LLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
 
     if groq_key:
         return instructor.from_openai(
             OpenAI(base_url="https://api.groq.com/openai/v1", api_key=groq_key),
         ), os.getenv("LLM_MODEL", "llama-3.1-8b-instant")
-
-    elif hf_token:
-        return instructor.from_openai(
-            OpenAI(base_url="https://router.huggingface.co/v1", api_key=hf_token),
-            mode=instructor.Mode.JSON,
-        ), os.getenv("LLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
 
     raise ValueError("LLM backend bulunamadı")
 
@@ -138,7 +180,7 @@ class NLQueryParser:
                 f"seniority: {query_spec.seniority}, "
                 f"location: {query_spec.locations}"
             )
-            return query_spec
+            return _apply_deterministic_fallbacks(query_spec, nl_text)
 
         except Exception as e:
             logger.error(f"❌ NL parse hatası: {e}")

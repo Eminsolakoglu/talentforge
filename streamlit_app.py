@@ -10,6 +10,21 @@ import os
 import tempfile
 from pyvis.network import Network
 import tempfile as tmp_module
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DEMO_LOCAL_NEO4J = os.getenv("STREAMLIT_DEMO_LOCAL_NEO4J", "true").lower() in {"1", "true", "yes"}
+if DEMO_LOCAL_NEO4J:
+    os.environ["NEO4J_URI"] = os.getenv("LOCAL_NEO4J_URI", "bolt://localhost:7687")
+    os.environ["NEO4J_USERNAME"] = os.getenv("LOCAL_NEO4J_USERNAME", "neo4j")
+    os.environ["NEO4J_PASSWORD"] = os.getenv(
+        "LOCAL_NEO4J_PASSWORD",
+        os.getenv("NEO4J_LOCAL_PASSWORD", "password123"),
+    )
+    os.environ["NEO4J_DATABASE"] = os.getenv("LOCAL_NEO4J_DATABASE", "neo4j")
+    os.environ.setdefault("LLM_BACKEND", "huggingface")
+    os.environ.setdefault("LLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
 
 API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
 
@@ -131,6 +146,53 @@ def render_candidate_card(candidate: dict, rank: int, expanded: bool = False):
 
 # ── Sayfa 1: CV Yükle ────────────────────────────────────────────────
 
+@st.cache_resource
+def _demo_matcher():
+    from app.core.database import get_neo4j_driver
+    from app.query.matcher import CandidateMatcher
+
+    return CandidateMatcher(get_neo4j_driver())
+
+
+@st.cache_resource
+def _demo_nl_parser():
+    from app.query.nl_parser import NLQueryParser
+
+    return NLQueryParser()
+
+
+@st.cache_resource
+def _demo_pipeline():
+    from app.extraction.pipeline import CVProcessingPipeline
+
+    return CVProcessingPipeline()
+
+
+def _search_local_neo4j(query: dict) -> list[dict]:
+    from app.schemas.query import QuerySpec
+
+    return _demo_matcher().search(QuerySpec(**query), limit=10)
+
+
+def _nl_search_local_neo4j(nl_query: str) -> dict:
+    query_spec = _demo_nl_parser().parse(nl_query)
+    results = _demo_matcher().search(query_spec, limit=10)
+    return {"parsed_query": query_spec.model_dump(), "results": results}
+
+
+def _process_cv_local_hf(uploaded_file) -> dict | None:
+    suffix = os.path.splitext(uploaded_file.name)[1].lower()
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
+        temp_path = temp_file.name
+        temp_file.write(uploaded_file.getvalue())
+
+    try:
+        return _demo_pipeline().process(temp_path)
+    finally:
+        if os.path.exists(temp_path):
+            os.unlink(temp_path)
+
+
 def page_upload():
     st.title("📄 CV Yükle")
     st.markdown(
@@ -147,13 +209,12 @@ def page_upload():
     if uploaded_file and st.button("🚀 İşle", type="primary", use_container_width=True):
         with st.spinner("CV işleniyor... (LLM çıkarımı + KG yazma + Entity Resolution + Embedding)"):
             try:
-                files = {"file": (uploaded_file.name, uploaded_file.getvalue())}
-                response = requests.post(
-                    f"{API_URL}/upload-cv", files=files, timeout=300
-                )
+                data = _process_cv_local_hf(uploaded_file)
+                if data is None:
+                    st.info("CV zaten sistemde kayitli veya islenemedi.")
+                    return
 
-                if response.status_code == 200:
-                    data = response.json()
+                if data is not None:
 
                     # Duplicate kontrolü
                     if data is None:
@@ -432,12 +493,8 @@ def page_search():
 
         with st.spinner("Aday araniyor..."):
             try:
-                response = requests.post(f"{API_URL}/search-candidates", json=query, timeout=30)
-                if response.status_code == 200:
-                    st.session_state["search_results"] = response.json()
-                    st.session_state["search_has_run"] = True
-                else:
-                    st.error(f"API hatasi: {response.text}")
+                st.session_state["search_results"] = _search_local_neo4j(query)
+                st.session_state["search_has_run"] = True
             except Exception as e:
                 st.error(f"Hata: {e}")
 
@@ -484,19 +541,10 @@ def page_nl_search():
 
         with st.spinner("Sorgu analiz ediliyor ve adaylar araniyor..."):
             try:
-                response = requests.post(
-                    f"{API_URL}/nl-search",
-                    json={"query": nl_query},
-                    timeout=60,
-                )
-
-                if response.status_code == 200:
-                    data = response.json()
-                    st.session_state["nl_parsed"] = data.get("parsed_query", {})
-                    st.session_state["nl_results"] = data.get("results", [])
-                    st.session_state["nl_has_run"] = True
-                else:
-                    st.error(f"API hatasi: {response.text}")
+                data = _nl_search_local_neo4j(nl_query)
+                st.session_state["nl_parsed"] = data.get("parsed_query", {})
+                st.session_state["nl_results"] = data.get("results", [])
+                st.session_state["nl_has_run"] = True
 
             except requests.exceptions.Timeout:
                 st.error("Zaman asimi. LLM analizi biraz uzun surebilir, tekrar deneyin.")

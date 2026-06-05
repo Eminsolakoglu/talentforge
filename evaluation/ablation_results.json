@@ -1,0 +1,2676 @@
+{
+  "SYS-B_Qwen2.5-7B-Instruct": {
+    "config": "SYS-B",
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "cv_results": [
+      {
+        "source_file": "cv_001_elif_yilmaz.docx",
+        "candidate_name": "Elif Yılmaz",
+        "domain": "Teknoloji / Perakende",
+        "elapsed_sec": 31.59,
+        "ner_f1": {
+          "skill_f1": 0.737,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.912
+        },
+        "re_f1": 0.586,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 9,
+        "predicted_skill_count": 9,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_002_mert_kaya.docx",
+        "candidate_name": "Mert Kaya",
+        "domain": "Fintech / Mobil",
+        "elapsed_sec": 14.53,
+        "ner_f1": {
+          "skill_f1": 0.833,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.944
+        },
+        "re_f1": 0.386,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 14,
+        "predicted_skill_count": 14,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_003_zeynep_demir.docx",
+        "candidate_name": "Zeynep Demir",
+        "domain": "SaaS / Tasarım",
+        "elapsed_sec": 22.61,
+        "ner_f1": {
+          "skill_f1": 0.952,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.984
+        },
+        "re_f1": 0.771,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 11,
+        "predicted_skill_count": 11,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_004_can_sahin.docx",
+        "candidate_name": "Can Şahin",
+        "domain": "Bankacılık / Güvenlik",
+        "elapsed_sec": 13.75,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.718,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_005_derya_celik.docx",
+        "candidate_name": "Derya Çelik",
+        "domain": "Bulut / Platform",
+        "elapsed_sec": 15.82,
+        "ner_f1": {
+          "skill_f1": 0.87,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.957
+        },
+        "re_f1": 0.33,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_006_emir_arslan.docx",
+        "candidate_name": "Emir Arslan",
+        "domain": "Yapay Zeka",
+        "elapsed_sec": 45.7,
+        "ner_f1": {
+          "skill_f1": 0.833,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.944
+        },
+        "re_f1": 0.448,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 14,
+        "predicted_skill_count": 14,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_007_aylin_aydin.docx",
+        "candidate_name": "Aylin Aydın",
+        "domain": "E-Ticaret / Ürün",
+        "elapsed_sec": 16.85,
+        "ner_f1": {
+          "skill_f1": 0.9,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.967
+        },
+        "re_f1": 0.53,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_008_kerem_ozturk.docx",
+        "candidate_name": "Kerem Öztürk",
+        "domain": "Pazarlama / Ajans",
+        "elapsed_sec": 21.8,
+        "ner_f1": {
+          "skill_f1": 0.783,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.928
+        },
+        "re_f1": 0.341,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_009_naz_kilic.docx",
+        "candidate_name": "Naz Kılıç",
+        "domain": "İnsan Kaynakları",
+        "elapsed_sec": 19.04,
+        "ner_f1": {
+          "skill_f1": 0.762,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.921
+        },
+        "re_f1": 0.552,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 11,
+        "predicted_skill_count": 11,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_010_deniz_koc.docx",
+        "candidate_name": "Deniz Koç",
+        "domain": "Finans / Yatırım",
+        "elapsed_sec": 10.64,
+        "ner_f1": {
+          "skill_f1": 0.632,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.877
+        },
+        "re_f1": 0.714,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 9,
+        "predicted_skill_count": 9,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_011_i_rem_kurt.docx",
+        "candidate_name": "İrem Kurt",
+        "domain": "Üretim / Otomotiv",
+        "elapsed_sec": 13.35,
+        "ner_f1": {
+          "skill_f1": 0.952,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.984
+        },
+        "re_f1": 0.631,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 11,
+        "predicted_skill_count": 11,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_012_arda_aksoy.docx",
+        "candidate_name": "Arda Aksoy",
+        "domain": "İnşaat / Şantiye",
+        "elapsed_sec": 21.06,
+        "ner_f1": {
+          "skill_f1": 0.783,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.928
+        },
+        "re_f1": 0.475,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_013_selin_polat.docx",
+        "candidate_name": "Selin Polat",
+        "domain": "Sağlık / Hastane",
+        "elapsed_sec": 15.06,
+        "ner_f1": {
+          "skill_f1": 0.444,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.815
+        },
+        "re_f1": 0.408,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 8,
+        "predicted_skill_count": 8,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_014_ege_gunes.docx",
+        "candidate_name": "Ege Güneş",
+        "domain": "Hukuk / Danışmanlık",
+        "elapsed_sec": 16.04,
+        "ner_f1": {
+          "skill_f1": 0.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.667
+        },
+        "re_f1": 0.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 7,
+        "predicted_skill_count": 7,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_015_buse_erdogan.docx",
+        "candidate_name": "Buse Erdoğan",
+        "domain": "Eğitim",
+        "elapsed_sec": 20.13,
+        "ner_f1": {
+          "skill_f1": 0.87,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.957
+        },
+        "re_f1": 0.476,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_016_onur_tas.docx",
+        "candidate_name": "Onur Taş",
+        "domain": "Mimarlık / Tasarım",
+        "elapsed_sec": 13.44,
+        "ner_f1": {
+          "skill_f1": 0.667,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.889
+        },
+        "re_f1": 0.453,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 8,
+        "predicted_skill_count": 8,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_017_ceren_cetin.docx",
+        "candidate_name": "Ceren Çetin",
+        "domain": "Lojistik / Operasyon",
+        "elapsed_sec": 17.6,
+        "ner_f1": {
+          "skill_f1": 0.947,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.982
+        },
+        "re_f1": 0.795,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 9,
+        "predicted_skill_count": 9,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_018_kaan_bulut.docx",
+        "candidate_name": "Kaan Bulut",
+        "domain": "B2B Satış",
+        "elapsed_sec": 14.91,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.775,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_019_melis_ucar.docx",
+        "candidate_name": "Melis Uçar",
+        "domain": "Sağlık Teknolojileri",
+        "elapsed_sec": 14.32,
+        "ner_f1": {
+          "skill_f1": 0.909,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.97
+        },
+        "re_f1": 0.745,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 12,
+        "predicted_skill_count": 12,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_020_baran_kaplan.docx",
+        "candidate_name": "Baran Kaplan",
+        "domain": "Yaratıcı / Ajans",
+        "elapsed_sec": 15.37,
+        "ner_f1": {
+          "skill_f1": 0.5,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.833
+        },
+        "re_f1": 0.372,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      }
+    ],
+    "aggregate": {
+      "n_cvs": 20,
+      "avg_skill_f1": 0.769,
+      "avg_company_f1": 1.0,
+      "avg_education_f1": 1.0,
+      "avg_overall_ner_f1": 0.923,
+      "avg_re_f1": 0.525,
+      "avg_hallucination_rate": 0.0,
+      "total_hallucinated": 0,
+      "total_skills": 215,
+      "avg_elapsed_sec": 18.68,
+      "total_elapsed_sec": 373.6
+    }
+  },
+  "SYS-B_Llama-3.1-8B-Instruct": {
+    "config": "SYS-B",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "cv_results": [
+      {
+        "source_file": "cv_001_elif_yilmaz.docx",
+        "candidate_name": "Elif Yılmaz",
+        "domain": "Teknoloji / Perakende",
+        "elapsed_sec": 24.39,
+        "ner_f1": {
+          "skill_f1": 0.833,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.944
+        },
+        "re_f1": 0.745,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 14,
+        "predicted_skill_count": 14,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_002_mert_kaya.docx",
+        "candidate_name": "Mert Kaya",
+        "error": "LLM failed",
+        "elapsed_sec": 27.12
+      },
+      {
+        "source_file": "cv_003_zeynep_demir.docx",
+        "candidate_name": "Zeynep Demir",
+        "error": "LLM failed",
+        "elapsed_sec": 27.46
+      },
+      {
+        "source_file": "cv_004_can_sahin.docx",
+        "candidate_name": "Can Şahin",
+        "error": "LLM failed",
+        "elapsed_sec": 27.16
+      },
+      {
+        "source_file": "cv_005_derya_celik.docx",
+        "candidate_name": "Derya Çelik",
+        "domain": "Bulut / Platform",
+        "elapsed_sec": 12.89,
+        "ner_f1": {
+          "skill_f1": 0.909,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.97
+        },
+        "re_f1": 0.25,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 12,
+        "predicted_skill_count": 12,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_006_emir_arslan.docx",
+        "candidate_name": "Emir Arslan",
+        "domain": "Yapay Zeka",
+        "elapsed_sec": 24.06,
+        "ner_f1": {
+          "skill_f1": 0.87,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.957
+        },
+        "re_f1": 0.143,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_007_aylin_aydin.docx",
+        "candidate_name": "Aylin Aydın",
+        "domain": "E-Ticaret / Ürün",
+        "elapsed_sec": 20.59,
+        "ner_f1": {
+          "skill_f1": 0.87,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.957
+        },
+        "re_f1": 0.674,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_008_kerem_ozturk.docx",
+        "candidate_name": "Kerem Öztürk",
+        "domain": "Pazarlama / Ajans",
+        "elapsed_sec": 22.86,
+        "ner_f1": {
+          "skill_f1": 0.87,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.957
+        },
+        "re_f1": 0.279,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_009_naz_kilic.docx",
+        "candidate_name": "Naz Kılıç",
+        "domain": "İnsan Kaynakları",
+        "elapsed_sec": 26.97,
+        "ner_f1": {
+          "skill_f1": 0.87,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.957
+        },
+        "re_f1": 0.372,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_010_deniz_koc.docx",
+        "candidate_name": "Deniz Koç",
+        "domain": "Finans / Yatırım",
+        "elapsed_sec": 20.48,
+        "ner_f1": {
+          "skill_f1": 0.833,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.944
+        },
+        "re_f1": 0.485,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 14,
+        "predicted_skill_count": 14,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_011_i_rem_kurt.docx",
+        "candidate_name": "İrem Kurt",
+        "domain": "Üretim / Otomotiv",
+        "elapsed_sec": 11.96,
+        "ner_f1": {
+          "skill_f1": 0.909,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.97
+        },
+        "re_f1": 0.397,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 12,
+        "predicted_skill_count": 12,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_012_arda_aksoy.docx",
+        "candidate_name": "Arda Aksoy",
+        "domain": "İnşaat / Şantiye",
+        "elapsed_sec": 21.09,
+        "ner_f1": {
+          "skill_f1": 0.833,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.944
+        },
+        "re_f1": 0.367,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 14,
+        "predicted_skill_count": 14,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_013_selin_polat.docx",
+        "candidate_name": "Selin Polat",
+        "domain": "Sağlık / Hastane",
+        "elapsed_sec": 23.2,
+        "ner_f1": {
+          "skill_f1": 0.833,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.944
+        },
+        "re_f1": 0.254,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 14,
+        "predicted_skill_count": 14,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_014_ege_gunes.docx",
+        "candidate_name": "Ege Güneş",
+        "domain": "Hukuk / Danışmanlık",
+        "elapsed_sec": 23.56,
+        "ner_f1": {
+          "skill_f1": 0.833,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.944
+        },
+        "re_f1": 0.214,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 14,
+        "predicted_skill_count": 14,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_015_buse_erdogan.docx",
+        "candidate_name": "Buse Erdoğan",
+        "domain": "Eğitim",
+        "elapsed_sec": 23.32,
+        "ner_f1": {
+          "skill_f1": 0.87,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.957
+        },
+        "re_f1": 0.382,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_016_onur_tas.docx",
+        "candidate_name": "Onur Taş",
+        "domain": "Mimarlık / Tasarım",
+        "elapsed_sec": 20.3,
+        "ner_f1": {
+          "skill_f1": 0.87,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.957
+        },
+        "re_f1": 0.486,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_017_ceren_cetin.docx",
+        "candidate_name": "Ceren Çetin",
+        "error": "LLM failed",
+        "elapsed_sec": 27.25
+      },
+      {
+        "source_file": "cv_018_kaan_bulut.docx",
+        "candidate_name": "Kaan Bulut",
+        "error": "LLM failed",
+        "elapsed_sec": 11.57
+      },
+      {
+        "source_file": "cv_019_melis_ucar.docx",
+        "candidate_name": "Melis Uçar",
+        "domain": "Sağlık Teknolojileri",
+        "elapsed_sec": 22.34,
+        "ner_f1": {
+          "skill_f1": 0.833,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.944
+        },
+        "re_f1": 0.467,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 14,
+        "predicted_skill_count": 14,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_020_baran_kaplan.docx",
+        "candidate_name": "Baran Kaplan",
+        "error": "LLM failed",
+        "elapsed_sec": 27.36
+      }
+    ],
+    "aggregate": {
+      "n_cvs": 14,
+      "avg_skill_f1": 0.86,
+      "avg_company_f1": 1.0,
+      "avg_education_f1": 1.0,
+      "avg_overall_ner_f1": 0.953,
+      "avg_re_f1": 0.394,
+      "avg_hallucination_rate": 0.0,
+      "total_hallucinated": 0,
+      "total_skills": 186,
+      "avg_elapsed_sec": 21.29,
+      "total_elapsed_sec": 298.0
+    }
+  },
+  "SYS-B_Mistral-7B-Instruct-v0.3": {
+    "config": "SYS-B",
+    "model": "mistralai/Mistral-7B-Instruct-v0.3",
+    "cv_results": [
+      {
+        "source_file": "cv_001_elif_yilmaz.docx",
+        "candidate_name": "Elif Yılmaz",
+        "error": "LLM failed",
+        "elapsed_sec": 0.88
+      },
+      {
+        "source_file": "cv_002_mert_kaya.docx",
+        "candidate_name": "Mert Kaya",
+        "error": "LLM failed",
+        "elapsed_sec": 0.75
+      },
+      {
+        "source_file": "cv_003_zeynep_demir.docx",
+        "candidate_name": "Zeynep Demir",
+        "error": "LLM failed",
+        "elapsed_sec": 0.64
+      },
+      {
+        "source_file": "cv_004_can_sahin.docx",
+        "candidate_name": "Can Şahin",
+        "error": "LLM failed",
+        "elapsed_sec": 0.63
+      },
+      {
+        "source_file": "cv_005_derya_celik.docx",
+        "candidate_name": "Derya Çelik",
+        "error": "LLM failed",
+        "elapsed_sec": 0.62
+      },
+      {
+        "source_file": "cv_006_emir_arslan.docx",
+        "candidate_name": "Emir Arslan",
+        "error": "LLM failed",
+        "elapsed_sec": 0.63
+      },
+      {
+        "source_file": "cv_007_aylin_aydin.docx",
+        "candidate_name": "Aylin Aydın",
+        "error": "LLM failed",
+        "elapsed_sec": 0.66
+      },
+      {
+        "source_file": "cv_008_kerem_ozturk.docx",
+        "candidate_name": "Kerem Öztürk",
+        "error": "LLM failed",
+        "elapsed_sec": 0.69
+      },
+      {
+        "source_file": "cv_009_naz_kilic.docx",
+        "candidate_name": "Naz Kılıç",
+        "error": "LLM failed",
+        "elapsed_sec": 0.7
+      },
+      {
+        "source_file": "cv_010_deniz_koc.docx",
+        "candidate_name": "Deniz Koç",
+        "error": "LLM failed",
+        "elapsed_sec": 0.76
+      },
+      {
+        "source_file": "cv_011_i_rem_kurt.docx",
+        "candidate_name": "İrem Kurt",
+        "error": "LLM failed",
+        "elapsed_sec": 0.84
+      },
+      {
+        "source_file": "cv_012_arda_aksoy.docx",
+        "candidate_name": "Arda Aksoy",
+        "error": "LLM failed",
+        "elapsed_sec": 0.82
+      },
+      {
+        "source_file": "cv_013_selin_polat.docx",
+        "candidate_name": "Selin Polat",
+        "error": "LLM failed",
+        "elapsed_sec": 0.86
+      },
+      {
+        "source_file": "cv_014_ege_gunes.docx",
+        "candidate_name": "Ege Güneş",
+        "error": "LLM failed",
+        "elapsed_sec": 0.8
+      },
+      {
+        "source_file": "cv_015_buse_erdogan.docx",
+        "candidate_name": "Buse Erdoğan",
+        "error": "LLM failed",
+        "elapsed_sec": 0.78
+      },
+      {
+        "source_file": "cv_016_onur_tas.docx",
+        "candidate_name": "Onur Taş",
+        "error": "LLM failed",
+        "elapsed_sec": 0.72
+      },
+      {
+        "source_file": "cv_017_ceren_cetin.docx",
+        "candidate_name": "Ceren Çetin",
+        "error": "LLM failed",
+        "elapsed_sec": 0.66
+      },
+      {
+        "source_file": "cv_018_kaan_bulut.docx",
+        "candidate_name": "Kaan Bulut",
+        "error": "LLM failed",
+        "elapsed_sec": 0.64
+      },
+      {
+        "source_file": "cv_019_melis_ucar.docx",
+        "candidate_name": "Melis Uçar",
+        "error": "LLM failed",
+        "elapsed_sec": 0.73
+      },
+      {
+        "source_file": "cv_020_baran_kaplan.docx",
+        "candidate_name": "Baran Kaplan",
+        "error": "LLM failed",
+        "elapsed_sec": 0.83
+      }
+    ],
+    "aggregate": {}
+  },
+  "SYS-B_Qwen2.5-72B-Instruct": {
+    "config": "SYS-B",
+    "model": "Qwen/Qwen2.5-72B-Instruct",
+    "cv_results": [
+      {
+        "source_file": "cv_001_elif_yilmaz.docx",
+        "candidate_name": "Elif Yılmaz",
+        "domain": "Teknoloji / Perakende",
+        "elapsed_sec": 56.94,
+        "ner_f1": {
+          "skill_f1": 0.857,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.952
+        },
+        "re_f1": 0.558,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 11,
+        "predicted_skill_count": 11,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_002_mert_kaya.docx",
+        "candidate_name": "Mert Kaya",
+        "domain": "Fintech / Mobil",
+        "elapsed_sec": 48.81,
+        "ner_f1": {
+          "skill_f1": 0.87,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.957
+        },
+        "re_f1": 0.745,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_003_zeynep_demir.docx",
+        "candidate_name": "Zeynep Demir",
+        "domain": "SaaS / Tasarım",
+        "elapsed_sec": 50.32,
+        "ner_f1": {
+          "skill_f1": 0.952,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.984
+        },
+        "re_f1": 0.528,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 11,
+        "predicted_skill_count": 11,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_004_can_sahin.docx",
+        "candidate_name": "Can Şahin",
+        "domain": "Bankacılık / Güvenlik",
+        "elapsed_sec": 64.26,
+        "ner_f1": {
+          "skill_f1": 0.909,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.97
+        },
+        "re_f1": 0.375,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 12,
+        "predicted_skill_count": 12,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_005_derya_celik.docx",
+        "candidate_name": "Derya Çelik",
+        "domain": "Bulut / Platform",
+        "elapsed_sec": 44.28,
+        "ner_f1": {
+          "skill_f1": 0.909,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.97
+        },
+        "re_f1": 0.241,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 12,
+        "predicted_skill_count": 12,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_006_emir_arslan.docx",
+        "candidate_name": "Emir Arslan",
+        "error": "LLM failed",
+        "elapsed_sec": 53.85
+      },
+      {
+        "source_file": "cv_007_aylin_aydin.docx",
+        "candidate_name": "Aylin Aydın",
+        "domain": "E-Ticaret / Ürün",
+        "elapsed_sec": 63.81,
+        "ner_f1": {
+          "skill_f1": 0.87,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.957
+        },
+        "re_f1": 0.343,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_008_kerem_ozturk.docx",
+        "candidate_name": "Kerem Öztürk",
+        "domain": "Pazarlama / Ajans",
+        "elapsed_sec": 64.34,
+        "ner_f1": {
+          "skill_f1": 0.783,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.928
+        },
+        "re_f1": 0.256,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_009_naz_kilic.docx",
+        "candidate_name": "Naz Kılıç",
+        "error": "LLM failed",
+        "elapsed_sec": 52.16
+      },
+      {
+        "source_file": "cv_010_deniz_koc.docx",
+        "candidate_name": "Deniz Koç",
+        "domain": "Finans / Yatırım",
+        "elapsed_sec": 52.36,
+        "ner_f1": {
+          "skill_f1": 0.952,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.984
+        },
+        "re_f1": 0.712,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 11,
+        "predicted_skill_count": 11,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_011_i_rem_kurt.docx",
+        "candidate_name": "İrem Kurt",
+        "domain": "Üretim / Otomotiv",
+        "elapsed_sec": 100.67,
+        "ner_f1": {
+          "skill_f1": 0.909,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.97
+        },
+        "re_f1": 0.496,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 12,
+        "predicted_skill_count": 12,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_012_arda_aksoy.docx",
+        "candidate_name": "Arda Aksoy",
+        "domain": "İnşaat / Şantiye",
+        "elapsed_sec": 55.78,
+        "ner_f1": {
+          "skill_f1": 0.952,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.984
+        },
+        "re_f1": 0.598,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 11,
+        "predicted_skill_count": 11,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_013_selin_polat.docx",
+        "candidate_name": "Selin Polat",
+        "domain": "Sağlık / Hastane",
+        "elapsed_sec": 66.42,
+        "ner_f1": {
+          "skill_f1": 0.87,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.957
+        },
+        "re_f1": 0.361,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_014_ege_gunes.docx",
+        "candidate_name": "Ege Güneş",
+        "domain": "Hukuk / Danışmanlık",
+        "elapsed_sec": 54.4,
+        "ner_f1": {
+          "skill_f1": 0.87,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.957
+        },
+        "re_f1": 0.296,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_015_buse_erdogan.docx",
+        "candidate_name": "Buse Erdoğan",
+        "domain": "Eğitim",
+        "elapsed_sec": 38.52,
+        "ner_f1": {
+          "skill_f1": 0.952,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.984
+        },
+        "re_f1": 0.373,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 11,
+        "predicted_skill_count": 11,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_016_onur_tas.docx",
+        "candidate_name": "Onur Taş",
+        "domain": "Mimarlık / Tasarım",
+        "elapsed_sec": 32.14,
+        "ner_f1": {
+          "skill_f1": 0.952,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.984
+        },
+        "re_f1": 0.65,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 11,
+        "predicted_skill_count": 11,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_017_ceren_cetin.docx",
+        "candidate_name": "Ceren Çetin",
+        "domain": "Lojistik / Operasyon",
+        "elapsed_sec": 78.92,
+        "ner_f1": {
+          "skill_f1": 0.952,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.984
+        },
+        "re_f1": 0.689,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 11,
+        "predicted_skill_count": 11,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_018_kaan_bulut.docx",
+        "candidate_name": "Kaan Bulut",
+        "domain": "B2B Satış",
+        "elapsed_sec": 47.47,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.633,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_019_melis_ucar.docx",
+        "candidate_name": "Melis Uçar",
+        "domain": "Sağlık Teknolojileri",
+        "elapsed_sec": 58.51,
+        "ner_f1": {
+          "skill_f1": 0.818,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.939
+        },
+        "re_f1": 0.333,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 12,
+        "predicted_skill_count": 12,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_020_baran_kaplan.docx",
+        "candidate_name": "Baran Kaplan",
+        "error": "LLM failed",
+        "elapsed_sec": 91.99
+      }
+    ],
+    "aggregate": {
+      "n_cvs": 17,
+      "avg_skill_f1": 0.905,
+      "avg_company_f1": 1.0,
+      "avg_education_f1": 1.0,
+      "avg_overall_ner_f1": 0.968,
+      "avg_re_f1": 0.482,
+      "avg_hallucination_rate": 0.0,
+      "total_hallucinated": 0,
+      "total_skills": 200,
+      "avg_elapsed_sec": 57.53,
+      "total_elapsed_sec": 978.0
+    }
+  },
+  "SYS-B_Mixtral-8x7B-Instruct-v0.1": {
+    "config": "SYS-B",
+    "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+    "cv_results": [
+      {
+        "source_file": "cv_001_elif_yilmaz.docx",
+        "candidate_name": "Elif Yılmaz",
+        "error": "LLM failed",
+        "elapsed_sec": 2.33
+      },
+      {
+        "source_file": "cv_002_mert_kaya.docx",
+        "candidate_name": "Mert Kaya",
+        "error": "LLM failed",
+        "elapsed_sec": 0.52
+      },
+      {
+        "source_file": "cv_003_zeynep_demir.docx",
+        "candidate_name": "Zeynep Demir",
+        "error": "LLM failed",
+        "elapsed_sec": 0.53
+      },
+      {
+        "source_file": "cv_004_can_sahin.docx",
+        "candidate_name": "Can Şahin",
+        "error": "LLM failed",
+        "elapsed_sec": 0.51
+      },
+      {
+        "source_file": "cv_005_derya_celik.docx",
+        "candidate_name": "Derya Çelik",
+        "error": "LLM failed",
+        "elapsed_sec": 0.53
+      },
+      {
+        "source_file": "cv_006_emir_arslan.docx",
+        "candidate_name": "Emir Arslan",
+        "error": "LLM failed",
+        "elapsed_sec": 0.66
+      },
+      {
+        "source_file": "cv_007_aylin_aydin.docx",
+        "candidate_name": "Aylin Aydın",
+        "error": "LLM failed",
+        "elapsed_sec": 0.59
+      },
+      {
+        "source_file": "cv_008_kerem_ozturk.docx",
+        "candidate_name": "Kerem Öztürk",
+        "error": "LLM failed",
+        "elapsed_sec": 0.52
+      },
+      {
+        "source_file": "cv_009_naz_kilic.docx",
+        "candidate_name": "Naz Kılıç",
+        "error": "LLM failed",
+        "elapsed_sec": 0.51
+      },
+      {
+        "source_file": "cv_010_deniz_koc.docx",
+        "candidate_name": "Deniz Koç",
+        "error": "LLM failed",
+        "elapsed_sec": 0.5
+      },
+      {
+        "source_file": "cv_011_i_rem_kurt.docx",
+        "candidate_name": "İrem Kurt",
+        "error": "LLM failed",
+        "elapsed_sec": 0.52
+      },
+      {
+        "source_file": "cv_012_arda_aksoy.docx",
+        "candidate_name": "Arda Aksoy",
+        "error": "LLM failed",
+        "elapsed_sec": 0.53
+      },
+      {
+        "source_file": "cv_013_selin_polat.docx",
+        "candidate_name": "Selin Polat",
+        "error": "LLM failed",
+        "elapsed_sec": 0.54
+      },
+      {
+        "source_file": "cv_014_ege_gunes.docx",
+        "candidate_name": "Ege Güneş",
+        "error": "LLM failed",
+        "elapsed_sec": 0.54
+      },
+      {
+        "source_file": "cv_015_buse_erdogan.docx",
+        "candidate_name": "Buse Erdoğan",
+        "error": "LLM failed",
+        "elapsed_sec": 0.52
+      },
+      {
+        "source_file": "cv_016_onur_tas.docx",
+        "candidate_name": "Onur Taş",
+        "error": "LLM failed",
+        "elapsed_sec": 0.56
+      },
+      {
+        "source_file": "cv_017_ceren_cetin.docx",
+        "candidate_name": "Ceren Çetin",
+        "error": "LLM failed",
+        "elapsed_sec": 0.55
+      },
+      {
+        "source_file": "cv_018_kaan_bulut.docx",
+        "candidate_name": "Kaan Bulut",
+        "error": "LLM failed",
+        "elapsed_sec": 0.5
+      },
+      {
+        "source_file": "cv_019_melis_ucar.docx",
+        "candidate_name": "Melis Uçar",
+        "error": "LLM failed",
+        "elapsed_sec": 0.55
+      },
+      {
+        "source_file": "cv_020_baran_kaplan.docx",
+        "candidate_name": "Baran Kaplan",
+        "error": "LLM failed",
+        "elapsed_sec": 0.53
+      }
+    ],
+    "aggregate": {}
+  },
+  "SYS-B_gpt-4o-mini": {
+    "config": "SYS-B",
+    "model": "gpt-4o-mini",
+    "cv_results": [
+      {
+        "source_file": "cv_001_elif_yilmaz.docx",
+        "candidate_name": "Elif Yılmaz",
+        "error": "LLM failed",
+        "elapsed_sec": 3.5
+      },
+      {
+        "source_file": "cv_002_mert_kaya.docx",
+        "candidate_name": "Mert Kaya",
+        "error": "LLM failed",
+        "elapsed_sec": 2.89
+      },
+      {
+        "source_file": "cv_003_zeynep_demir.docx",
+        "candidate_name": "Zeynep Demir",
+        "error": "LLM failed",
+        "elapsed_sec": 3.21
+      },
+      {
+        "source_file": "cv_004_can_sahin.docx",
+        "candidate_name": "Can Şahin",
+        "error": "LLM failed",
+        "elapsed_sec": 2.26
+      },
+      {
+        "source_file": "cv_005_derya_celik.docx",
+        "candidate_name": "Derya Çelik",
+        "error": "LLM failed",
+        "elapsed_sec": 2.22
+      },
+      {
+        "source_file": "cv_006_emir_arslan.docx",
+        "candidate_name": "Emir Arslan",
+        "error": "LLM failed",
+        "elapsed_sec": 2.42
+      },
+      {
+        "source_file": "cv_007_aylin_aydin.docx",
+        "candidate_name": "Aylin Aydın",
+        "error": "LLM failed",
+        "elapsed_sec": 2.28
+      },
+      {
+        "source_file": "cv_008_kerem_ozturk.docx",
+        "candidate_name": "Kerem Öztürk",
+        "error": "LLM failed",
+        "elapsed_sec": 2.15
+      },
+      {
+        "source_file": "cv_009_naz_kilic.docx",
+        "candidate_name": "Naz Kılıç",
+        "error": "LLM failed",
+        "elapsed_sec": 2.21
+      },
+      {
+        "source_file": "cv_010_deniz_koc.docx",
+        "candidate_name": "Deniz Koç",
+        "error": "LLM failed",
+        "elapsed_sec": 1.99
+      },
+      {
+        "source_file": "cv_011_i_rem_kurt.docx",
+        "candidate_name": "İrem Kurt",
+        "error": "LLM failed",
+        "elapsed_sec": 2.1
+      },
+      {
+        "source_file": "cv_012_arda_aksoy.docx",
+        "candidate_name": "Arda Aksoy",
+        "error": "LLM failed",
+        "elapsed_sec": 2.15
+      },
+      {
+        "source_file": "cv_013_selin_polat.docx",
+        "candidate_name": "Selin Polat",
+        "error": "LLM failed",
+        "elapsed_sec": 2.19
+      },
+      {
+        "source_file": "cv_014_ege_gunes.docx",
+        "candidate_name": "Ege Güneş",
+        "error": "LLM failed",
+        "elapsed_sec": 2.19
+      },
+      {
+        "source_file": "cv_015_buse_erdogan.docx",
+        "candidate_name": "Buse Erdoğan",
+        "error": "LLM failed",
+        "elapsed_sec": 2.11
+      },
+      {
+        "source_file": "cv_016_onur_tas.docx",
+        "candidate_name": "Onur Taş",
+        "error": "LLM failed",
+        "elapsed_sec": 2.11
+      },
+      {
+        "source_file": "cv_017_ceren_cetin.docx",
+        "candidate_name": "Ceren Çetin",
+        "error": "LLM failed",
+        "elapsed_sec": 2.17
+      },
+      {
+        "source_file": "cv_018_kaan_bulut.docx",
+        "candidate_name": "Kaan Bulut",
+        "error": "LLM failed",
+        "elapsed_sec": 2.08
+      },
+      {
+        "source_file": "cv_019_melis_ucar.docx",
+        "candidate_name": "Melis Uçar",
+        "error": "LLM failed",
+        "elapsed_sec": 2.34
+      },
+      {
+        "source_file": "cv_020_baran_kaplan.docx",
+        "candidate_name": "Baran Kaplan",
+        "error": "LLM failed",
+        "elapsed_sec": 2.09
+      }
+    ],
+    "aggregate": {}
+  },
+  "SYS-B_gemini-1.5-flash": {
+    "config": "SYS-B",
+    "model": "gemini-1.5-flash",
+    "cv_results": [
+      {
+        "source_file": "cv_001_elif_yilmaz.docx",
+        "candidate_name": "Elif Yılmaz",
+        "error": "LLM failed",
+        "elapsed_sec": 0.48
+      },
+      {
+        "source_file": "cv_002_mert_kaya.docx",
+        "candidate_name": "Mert Kaya",
+        "error": "LLM failed",
+        "elapsed_sec": 0.52
+      },
+      {
+        "source_file": "cv_003_zeynep_demir.docx",
+        "candidate_name": "Zeynep Demir",
+        "error": "LLM failed",
+        "elapsed_sec": 0.49
+      },
+      {
+        "source_file": "cv_004_can_sahin.docx",
+        "candidate_name": "Can Şahin",
+        "error": "LLM failed",
+        "elapsed_sec": 0.5
+      },
+      {
+        "source_file": "cv_005_derya_celik.docx",
+        "candidate_name": "Derya Çelik",
+        "error": "LLM failed",
+        "elapsed_sec": 0.52
+      },
+      {
+        "source_file": "cv_006_emir_arslan.docx",
+        "candidate_name": "Emir Arslan",
+        "error": "LLM failed",
+        "elapsed_sec": 0.52
+      },
+      {
+        "source_file": "cv_007_aylin_aydin.docx",
+        "candidate_name": "Aylin Aydın",
+        "error": "LLM failed",
+        "elapsed_sec": 0.51
+      },
+      {
+        "source_file": "cv_008_kerem_ozturk.docx",
+        "candidate_name": "Kerem Öztürk",
+        "error": "LLM failed",
+        "elapsed_sec": 0.5
+      },
+      {
+        "source_file": "cv_009_naz_kilic.docx",
+        "candidate_name": "Naz Kılıç",
+        "error": "LLM failed",
+        "elapsed_sec": 0.53
+      },
+      {
+        "source_file": "cv_010_deniz_koc.docx",
+        "candidate_name": "Deniz Koç",
+        "error": "LLM failed",
+        "elapsed_sec": 0.5
+      },
+      {
+        "source_file": "cv_011_i_rem_kurt.docx",
+        "candidate_name": "İrem Kurt",
+        "error": "LLM failed",
+        "elapsed_sec": 0.5
+      },
+      {
+        "source_file": "cv_012_arda_aksoy.docx",
+        "candidate_name": "Arda Aksoy",
+        "error": "LLM failed",
+        "elapsed_sec": 0.6
+      },
+      {
+        "source_file": "cv_013_selin_polat.docx",
+        "candidate_name": "Selin Polat",
+        "error": "LLM failed",
+        "elapsed_sec": 0.61
+      },
+      {
+        "source_file": "cv_014_ege_gunes.docx",
+        "candidate_name": "Ege Güneş",
+        "error": "LLM failed",
+        "elapsed_sec": 0.57
+      },
+      {
+        "source_file": "cv_015_buse_erdogan.docx",
+        "candidate_name": "Buse Erdoğan",
+        "error": "LLM failed",
+        "elapsed_sec": 0.53
+      },
+      {
+        "source_file": "cv_016_onur_tas.docx",
+        "candidate_name": "Onur Taş",
+        "error": "LLM failed",
+        "elapsed_sec": 0.52
+      },
+      {
+        "source_file": "cv_017_ceren_cetin.docx",
+        "candidate_name": "Ceren Çetin",
+        "error": "LLM failed",
+        "elapsed_sec": 0.49
+      },
+      {
+        "source_file": "cv_018_kaan_bulut.docx",
+        "candidate_name": "Kaan Bulut",
+        "error": "LLM failed",
+        "elapsed_sec": 0.54
+      },
+      {
+        "source_file": "cv_019_melis_ucar.docx",
+        "candidate_name": "Melis Uçar",
+        "error": "LLM failed",
+        "elapsed_sec": 0.5
+      },
+      {
+        "source_file": "cv_020_baran_kaplan.docx",
+        "candidate_name": "Baran Kaplan",
+        "error": "LLM failed",
+        "elapsed_sec": 0.5
+      }
+    ],
+    "aggregate": {}
+  },
+  "BL-1_Qwen2.5-7B-Instruct": {
+    "config": "BL-1",
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "cv_results": [
+      {
+        "source_file": "cv_001_elif_yilmaz.docx",
+        "candidate_name": "Elif Yılmaz",
+        "domain": "Teknoloji / Perakende",
+        "elapsed_sec": 15.22,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.732,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_002_mert_kaya.docx",
+        "candidate_name": "Mert Kaya",
+        "domain": "Fintech / Mobil",
+        "elapsed_sec": 14.8,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.745,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_003_zeynep_demir.docx",
+        "candidate_name": "Zeynep Demir",
+        "domain": "SaaS / Tasarım",
+        "elapsed_sec": 13.61,
+        "ner_f1": {
+          "skill_f1": 0.889,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.963
+        },
+        "re_f1": 0.742,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 8,
+        "predicted_skill_count": 8,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_004_can_sahin.docx",
+        "candidate_name": "Can Şahin",
+        "domain": "Bankacılık / Güvenlik",
+        "elapsed_sec": 15.24,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.564,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_005_derya_celik.docx",
+        "candidate_name": "Derya Çelik",
+        "domain": "Bulut / Platform",
+        "elapsed_sec": 16.21,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.645,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_006_emir_arslan.docx",
+        "candidate_name": "Emir Arslan",
+        "domain": "Yapay Zeka",
+        "elapsed_sec": 19.49,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.745,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_007_aylin_aydin.docx",
+        "candidate_name": "Aylin Aydın",
+        "domain": "E-Ticaret / Ürün",
+        "elapsed_sec": 14.4,
+        "ner_f1": {
+          "skill_f1": 0.947,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.982
+        },
+        "re_f1": 0.667,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 9,
+        "predicted_skill_count": 9,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_008_kerem_ozturk.docx",
+        "candidate_name": "Kerem Öztürk",
+        "domain": "Pazarlama / Ajans",
+        "elapsed_sec": 17.6,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.719,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_009_naz_kilic.docx",
+        "candidate_name": "Naz Kılıç",
+        "domain": "İnsan Kaynakları",
+        "elapsed_sec": 14.7,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 0.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.667
+        },
+        "re_f1": 0.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_010_deniz_koc.docx",
+        "candidate_name": "Deniz Koç",
+        "domain": "Finans / Yatırım",
+        "elapsed_sec": 13.81,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.721,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_011_i_rem_kurt.docx",
+        "candidate_name": "İrem Kurt",
+        "domain": "Üretim / Otomotiv",
+        "elapsed_sec": 12.04,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.667,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_012_arda_aksoy.docx",
+        "candidate_name": "Arda Aksoy",
+        "domain": "İnşaat / Şantiye",
+        "elapsed_sec": 14.75,
+        "ner_f1": {
+          "skill_f1": 0.947,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.982
+        },
+        "re_f1": 0.69,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 9,
+        "predicted_skill_count": 9,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_013_selin_polat.docx",
+        "candidate_name": "Selin Polat",
+        "domain": "Sağlık / Hastane",
+        "elapsed_sec": 20.01,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.733,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_014_ege_gunes.docx",
+        "candidate_name": "Ege Güneş",
+        "domain": "Hukuk / Danışmanlık",
+        "elapsed_sec": 16.29,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.719,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_015_buse_erdogan.docx",
+        "candidate_name": "Buse Erdoğan",
+        "domain": "Eğitim",
+        "elapsed_sec": 15.74,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.476,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_016_onur_tas.docx",
+        "candidate_name": "Onur Taş",
+        "domain": "Mimarlık / Tasarım",
+        "elapsed_sec": 11.41,
+        "ner_f1": {
+          "skill_f1": 0.947,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.982
+        },
+        "re_f1": 0.671,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 9,
+        "predicted_skill_count": 9,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_017_ceren_cetin.docx",
+        "candidate_name": "Ceren Çetin",
+        "domain": "Lojistik / Operasyon",
+        "elapsed_sec": 21.4,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.773,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_018_kaan_bulut.docx",
+        "candidate_name": "Kaan Bulut",
+        "domain": "B2B Satış",
+        "elapsed_sec": 11.46,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.489,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_019_melis_ucar.docx",
+        "candidate_name": "Melis Uçar",
+        "domain": "Sağlık Teknolojileri",
+        "elapsed_sec": 11.66,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.664,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_020_baran_kaplan.docx",
+        "candidate_name": "Baran Kaplan",
+        "domain": "Yaratıcı / Ajans",
+        "elapsed_sec": 15.85,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.756,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      }
+    ],
+    "aggregate": {
+      "n_cvs": 20,
+      "avg_skill_f1": 0.987,
+      "avg_company_f1": 0.95,
+      "avg_education_f1": 1.0,
+      "avg_overall_ner_f1": 0.979,
+      "avg_re_f1": 0.646,
+      "avg_hallucination_rate": 0.0,
+      "total_hallucinated": 0,
+      "total_skills": 195,
+      "avg_elapsed_sec": 15.28,
+      "total_elapsed_sec": 305.7
+    }
+  },
+  "BL-2_Qwen2.5-7B-Instruct": {
+    "config": "BL-2",
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "cv_results": [
+      {
+        "source_file": "cv_001_elif_yilmaz.docx",
+        "candidate_name": "Elif Yılmaz",
+        "domain": "Teknoloji / Perakende",
+        "elapsed_sec": 12.05,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.522,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_002_mert_kaya.docx",
+        "candidate_name": "Mert Kaya",
+        "domain": "Fintech / Mobil",
+        "elapsed_sec": 17.76,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.684,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_003_zeynep_demir.docx",
+        "candidate_name": "Zeynep Demir",
+        "domain": "SaaS / Tasarım",
+        "elapsed_sec": 17.96,
+        "ner_f1": {
+          "skill_f1": 0.889,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.963
+        },
+        "re_f1": 0.742,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 8,
+        "predicted_skill_count": 8,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_004_can_sahin.docx",
+        "candidate_name": "Can Şahin",
+        "domain": "Bankacılık / Güvenlik",
+        "elapsed_sec": 18.23,
+        "ner_f1": {
+          "skill_f1": 0.909,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.97
+        },
+        "re_f1": 0.564,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 12,
+        "predicted_skill_count": 12,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_005_derya_celik.docx",
+        "candidate_name": "Derya Çelik",
+        "domain": "Bulut / Platform",
+        "elapsed_sec": 17.81,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.386,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_006_emir_arslan.docx",
+        "candidate_name": "Emir Arslan",
+        "domain": "Yapay Zeka",
+        "elapsed_sec": 17.06,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.385,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_007_aylin_aydin.docx",
+        "candidate_name": "Aylin Aydın",
+        "domain": "E-Ticaret / Ürün",
+        "elapsed_sec": 21.1,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.391,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_008_kerem_ozturk.docx",
+        "candidate_name": "Kerem Öztürk",
+        "domain": "Pazarlama / Ajans",
+        "elapsed_sec": 16.35,
+        "ner_f1": {
+          "skill_f1": 0.909,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.97
+        },
+        "re_f1": 0.361,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 12,
+        "predicted_skill_count": 12,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_009_naz_kilic.docx",
+        "candidate_name": "Naz Kılıç",
+        "domain": "İnsan Kaynakları",
+        "elapsed_sec": 15.07,
+        "ner_f1": {
+          "skill_f1": 0.6,
+          "company_f1": 0.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.533
+        },
+        "re_f1": 0.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_010_deniz_koc.docx",
+        "candidate_name": "Deniz Koç",
+        "domain": "Finans / Yatırım",
+        "elapsed_sec": 12.13,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.795,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_011_i_rem_kurt.docx",
+        "candidate_name": "İrem Kurt",
+        "domain": "Üretim / Otomotiv",
+        "elapsed_sec": 12.2,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.833,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_012_arda_aksoy.docx",
+        "candidate_name": "Arda Aksoy",
+        "domain": "İnşaat / Şantiye",
+        "elapsed_sec": 15.29,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.745,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_013_selin_polat.docx",
+        "candidate_name": "Selin Polat",
+        "domain": "Sağlık / Hastane",
+        "elapsed_sec": 18.94,
+        "ner_f1": {
+          "skill_f1": 0.588,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.863
+        },
+        "re_f1": 0.614,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 7,
+        "predicted_skill_count": 7,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_014_ege_gunes.docx",
+        "candidate_name": "Ege Güneş",
+        "domain": "Hukuk / Danışmanlık",
+        "elapsed_sec": 15.13,
+        "ner_f1": {
+          "skill_f1": 0.947,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.982
+        },
+        "re_f1": 0.719,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 9,
+        "predicted_skill_count": 9,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_015_buse_erdogan.docx",
+        "candidate_name": "Buse Erdoğan",
+        "domain": "Eğitim",
+        "elapsed_sec": 19.43,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.476,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_016_onur_tas.docx",
+        "candidate_name": "Onur Taş",
+        "domain": "Mimarlık / Tasarım",
+        "elapsed_sec": 12.78,
+        "ner_f1": {
+          "skill_f1": 0.947,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.982
+        },
+        "re_f1": 0.661,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 9,
+        "predicted_skill_count": 9,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_017_ceren_cetin.docx",
+        "candidate_name": "Ceren Çetin",
+        "domain": "Lojistik / Operasyon",
+        "elapsed_sec": 23.23,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.636,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_018_kaan_bulut.docx",
+        "candidate_name": "Kaan Bulut",
+        "domain": "B2B Satış",
+        "elapsed_sec": 13.6,
+        "ner_f1": {
+          "skill_f1": 0.909,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.97
+        },
+        "re_f1": 0.489,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 12,
+        "predicted_skill_count": 12,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_019_melis_ucar.docx",
+        "candidate_name": "Melis Uçar",
+        "domain": "Sağlık Teknolojileri",
+        "elapsed_sec": 14.44,
+        "ner_f1": {
+          "skill_f1": 0.909,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.97
+        },
+        "re_f1": 0.636,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 12,
+        "predicted_skill_count": 12,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_020_baran_kaplan.docx",
+        "candidate_name": "Baran Kaplan",
+        "domain": "Yaratıcı / Ajans",
+        "elapsed_sec": 16.1,
+        "ner_f1": {
+          "skill_f1": 0.762,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.921
+        },
+        "re_f1": 0.564,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 11,
+        "predicted_skill_count": 11,
+        "gold_skill_count": 10
+      }
+    ],
+    "aggregate": {
+      "n_cvs": 20,
+      "avg_skill_f1": 0.918,
+      "avg_company_f1": 0.95,
+      "avg_education_f1": 1.0,
+      "avg_overall_ner_f1": 0.956,
+      "avg_re_f1": 0.56,
+      "avg_hallucination_rate": 0.0,
+      "total_hallucinated": 0,
+      "total_skills": 202,
+      "avg_elapsed_sec": 16.33,
+      "total_elapsed_sec": 326.7
+    }
+  },
+  "SYS-A_Qwen2.5-7B-Instruct": {
+    "config": "SYS-A",
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "cv_results": [
+      {
+        "source_file": "cv_001_elif_yilmaz.docx",
+        "candidate_name": "Elif Yılmaz",
+        "domain": "Teknoloji / Perakende",
+        "elapsed_sec": 18.91,
+        "ner_f1": {
+          "skill_f1": 0.952,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.984
+        },
+        "re_f1": 0.374,
+        "hallucination_rate": 0.083,
+        "hallucinated_skills": 1,
+        "total_skills": 12,
+        "predicted_skill_count": 12,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_002_mert_kaya.docx",
+        "candidate_name": "Mert Kaya",
+        "domain": "Fintech / Mobil",
+        "elapsed_sec": 25.83,
+        "ner_f1": {
+          "skill_f1": 0.769,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.923
+        },
+        "re_f1": 0.457,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 16,
+        "predicted_skill_count": 16,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_003_zeynep_demir.docx",
+        "candidate_name": "Zeynep Demir",
+        "domain": "SaaS / Tasarım",
+        "elapsed_sec": 24.12,
+        "ner_f1": {
+          "skill_f1": 0.8,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.933
+        },
+        "re_f1": 0.1,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 15,
+        "predicted_skill_count": 15,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_004_can_sahin.docx",
+        "candidate_name": "Can Şahin",
+        "domain": "Bankacılık / Güvenlik",
+        "elapsed_sec": 24.16,
+        "ner_f1": {
+          "skill_f1": 0.889,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.963
+        },
+        "re_f1": 0.641,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 8,
+        "predicted_skill_count": 8,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_005_derya_celik.docx",
+        "candidate_name": "Derya Çelik",
+        "domain": "Bulut / Platform",
+        "elapsed_sec": 18.28,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.448,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_006_emir_arslan.docx",
+        "candidate_name": "Emir Arslan",
+        "domain": "Yapay Zeka",
+        "elapsed_sec": 24.53,
+        "ner_f1": {
+          "skill_f1": 0.818,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.939
+        },
+        "re_f1": 0.476,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 12,
+        "predicted_skill_count": 12,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_007_aylin_aydin.docx",
+        "candidate_name": "Aylin Aydın",
+        "domain": "E-Ticaret / Ürün",
+        "elapsed_sec": 24.04,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.391,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_008_kerem_ozturk.docx",
+        "candidate_name": "Kerem Öztürk",
+        "domain": "Pazarlama / Ajans",
+        "elapsed_sec": 19.86,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.373,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_009_naz_kilic.docx",
+        "candidate_name": "Naz Kılıç",
+        "domain": "İnsan Kaynakları",
+        "elapsed_sec": 18.86,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 0.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.667
+        },
+        "re_f1": 0.0,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_010_deniz_koc.docx",
+        "candidate_name": "Deniz Koç",
+        "domain": "Finans / Yatırım",
+        "elapsed_sec": 16.88,
+        "ner_f1": {
+          "skill_f1": 0.8,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.933
+        },
+        "re_f1": 0.795,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_011_i_rem_kurt.docx",
+        "candidate_name": "İrem Kurt",
+        "domain": "Üretim / Otomotiv",
+        "elapsed_sec": 16.17,
+        "ner_f1": {
+          "skill_f1": 0.783,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.928
+        },
+        "re_f1": 0.475,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_012_arda_aksoy.docx",
+        "candidate_name": "Arda Aksoy",
+        "domain": "İnşaat / Şantiye",
+        "elapsed_sec": 19.6,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.408,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_013_selin_polat.docx",
+        "candidate_name": "Selin Polat",
+        "domain": "Sağlık / Hastane",
+        "elapsed_sec": 27.56,
+        "ner_f1": {
+          "skill_f1": 0.833,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.944
+        },
+        "re_f1": 0.282,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 14,
+        "predicted_skill_count": 14,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_014_ege_gunes.docx",
+        "candidate_name": "Ege Güneş",
+        "domain": "Hukuk / Danışmanlık",
+        "elapsed_sec": 26.01,
+        "ner_f1": {
+          "skill_f1": 0.741,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.914
+        },
+        "re_f1": 0.267,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 17,
+        "predicted_skill_count": 17,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_015_buse_erdogan.docx",
+        "candidate_name": "Buse Erdoğan",
+        "domain": "Eğitim",
+        "elapsed_sec": 24.19,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.278,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_016_onur_tas.docx",
+        "candidate_name": "Onur Taş",
+        "domain": "Mimarlık / Tasarım",
+        "elapsed_sec": 18.19,
+        "ner_f1": {
+          "skill_f1": 0.8,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.933
+        },
+        "re_f1": 0.325,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 15,
+        "predicted_skill_count": 15,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_017_ceren_cetin.docx",
+        "candidate_name": "Ceren Çetin",
+        "domain": "Lojistik / Operasyon",
+        "elapsed_sec": 24.76,
+        "ner_f1": {
+          "skill_f1": 1.0,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 1.0
+        },
+        "re_f1": 0.795,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 10,
+        "predicted_skill_count": 10,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_018_kaan_bulut.docx",
+        "candidate_name": "Kaan Bulut",
+        "domain": "B2B Satış",
+        "elapsed_sec": 17.84,
+        "ner_f1": {
+          "skill_f1": 0.87,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.957
+        },
+        "re_f1": 0.111,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 13,
+        "predicted_skill_count": 13,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_019_melis_ucar.docx",
+        "candidate_name": "Melis Uçar",
+        "domain": "Sağlık Teknolojileri",
+        "elapsed_sec": 19.53,
+        "ner_f1": {
+          "skill_f1": 0.909,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.97
+        },
+        "re_f1": 0.475,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 12,
+        "predicted_skill_count": 12,
+        "gold_skill_count": 10
+      },
+      {
+        "source_file": "cv_020_baran_kaplan.docx",
+        "candidate_name": "Baran Kaplan",
+        "domain": "Yaratıcı / Ajans",
+        "elapsed_sec": 18.51,
+        "ner_f1": {
+          "skill_f1": 0.857,
+          "company_f1": 1.0,
+          "education_f1": 1.0,
+          "overall_f1": 0.952
+        },
+        "re_f1": 0.611,
+        "hallucination_rate": 0.0,
+        "hallucinated_skills": 0,
+        "total_skills": 11,
+        "predicted_skill_count": 11,
+        "gold_skill_count": 10
+      }
+    ],
+    "aggregate": {
+      "n_cvs": 20,
+      "avg_skill_f1": 0.891,
+      "avg_company_f1": 0.95,
+      "avg_education_f1": 1.0,
+      "avg_overall_ner_f1": 0.947,
+      "avg_re_f1": 0.404,
+      "avg_hallucination_rate": 0.004,
+      "total_hallucinated": 1,
+      "total_skills": 238,
+      "avg_elapsed_sec": 21.39,
+      "total_elapsed_sec": 427.8
+    }
+  }
+}

@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TalentForge | AI destekli aday eslestirme</title>
+    <meta
+      name="description"
+      content="TalentForge, CV'lerden bilgi cikarip Neo4j bilgi grafi ve hibrit graph/vector siralama ile aciklanabilir aday eslestirme yapan HR platformudur."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css?v=20260605-6" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="site-header" data-reveal>
+        <a class="brand" href="#home" data-route="landing" aria-label="TalentForge ana sayfa">
+          <img class="brand-logo" src="./tf_logo.png" alt="" width="38" height="38" />
+          <span>TalentForge</span>
+        </a>
+        <nav class="nav-links" aria-label="Ana navigasyon">
+          <a href="#how">Sistem</a>
+          <a href="#showcase">Urun</a>
+          <a href="#explain">Eslesme</a>
+          <a href="#faq">SSS</a>
+        </nav>
+        <div class="nav-actions">
+          <button class="ghost-btn" type="button" data-route="login">Giris</button>
+          <button class="primary-btn small" type="button" data-route="login">Baslayin</button>
+        </div>
+      </header>
+
+      <main>
+        <section id="landing-view" class="view active" aria-label="TalentForge landing">
+          <section id="home" class="hero section-grid">
+            <div class="hero-copy" data-reveal>
+              <p class="eyebrow">LLM CV extraction / Neo4j graph / Hybrid ranking</p>
+              <h1>IK ekipleri icin aciklanabilir aday zekasi.</h1>
+              <p class="hero-lead">
+                TalentForge CV'leri yapisal veriye cevirir, aday profilini bilgi grafinda modeller
+                ve pozisyon kriterlerine gore graph + vector sinyalleriyle siralar.
+              </p>
+              <div class="hero-actions">
+                <button class="primary-btn" type="button" data-route="login">Baslayin</button>
+                <button class="ghost-btn" type="button" data-demo-upload-trigger>Uye olmadan CV yukle</button>
+                <a class="secondary-link" href="#showcase">Urunu incele</a>
+              </div>
+              <div class="demo-upload-card" data-demo-upload>
+                <input id="demo-cv-input" type="file" accept=".pdf,.docx" hidden />
+                <div>
+                  <p class="eyebrow">Canli pipeline demo</p>
+                  <h3>CV'ni bilgi grafigine donustur.</h3>
+                  <p>PDF veya DOCX yukle; LLM extraction, Neo4j graph write ve embedding adimlari gercek API uzerinden calissin.</p>
+                </div>
+                <div class="upload-status" data-upload-status>CV secilmeyi bekliyor.</div>
+                <div class="upload-steps" aria-label="Pipeline adimlari">
+                  <span data-upload-step="parse">Parse</span>
+                  <span data-upload-step="extract">LLM</span>
+                  <span data-upload-step="graph">Graph</span>
+                  <span data-upload-step="embed">Embed</span>
+                </div>
+                <div class="upload-result" data-upload-result></div>
+              </div>
+              <div class="hero-stats" aria-label="Urun metrikleri">
+                <div><strong>50+</strong><span>demo CV</span></div>
+                <div><strong>384</strong><span>vector dim</span></div>
+                <div><strong>RRF</strong><span>hybrid rank</span></div>
+              </div>
+            </div>
+
+            <div class="browser-mock hero-browser" data-reveal>
+              <div class="browser-top">
+                <span></span><span></span><span></span>
+                <p>talentforge.app/match</p>
+              </div>
+              <div class="mock-dashboard">
+                <aside class="mock-sidebar">
+                  <b>TF</b>
+                  <span class="active-dot"></span>
+                  <span></span>
+                  <span></span>
+                </aside>
+                <div class="mock-content">
+                  <div class="mock-toolbar">
+                    <div>
+                      <small>Arama</small>
+                      <strong>Senior Backend Engineer</strong>
+                    </div>
+                    <button>Eslesme raporu</button>
+                  </div>
+                  <div class="rank-row hot">
+                    <span class="rank">01</span>
+                    <div>
+                      <strong>Elif Yilmaz</strong>
+                      <p>Python, FastAPI, AWS, PostgreSQL</p>
+                    </div>
+                    <b>92</b>
+                  </div>
+                  <div class="rank-row">
+                    <span class="rank">02</span>
+                    <div>
+                      <strong>Mert Kaya</strong>
+                      <p>Microservices, Docker, Kubernetes</p>
+                    </div>
+                    <b>84</b>
+                  </div>
+                  <div class="mini-graph" aria-label="Bilgi grafi mockup">
+                    <span class="node candidate">Candidate</span>
+                    <span class="node skill">Skill</span>
+                    <span class="node company">Company</span>
+                    <i class="edge e1"></i>
+                    <i class="edge e2"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="trusted-strip" data-reveal>
+            <span>Neo4j</span>
+            <span>FastAPI</span>
+            <span>Cloudflare R2</span>
+            <span>Sentence Transformers</span>
+            <span>Instructor</span>
+            <span>PostgreSQL ready</span>
+          </section>
+
+          <section id="how" class="section">
+            <div class="section-heading" data-reveal>
+              <p class="eyebrow">How it works</p>
+              <h2>CV'den aciklanabilir eslesmeye uc adim.</h2>
+            </div>
+            <div class="steps">
+              <article data-reveal>
+                <span>01</span>
+                <h3>Cikar</h3>
+                <p>PDF ve DOCX CV'ler parse edilir, LLM ile yetenek, deneyim, egitim ve kanit metinleri cikarilir.</p>
+              </article>
+              <article data-reveal>
+                <span>02</span>
+                <h3>Modelle</h3>
+                <p>Aday verisi Neo4j bilgi grafinda skill, sirket, deneyim ve sertifika iliskilerine donusur.</p>
+              </article>
+              <article data-reveal>
+                <span>03</span>
+                <h3>Eslestir</h3>
+                <p>Graph skoru, vektor benzerligi ve RRF birlesimiyle adaylar aciklamali olarak siralanir.</p>
+              </article>
+            </div>
+          </section>
+
+          <section id="showcase" class="section showcase">
+            <div class="section-heading" data-reveal>
+              <p class="eyebrow">Product showcase</p>
+              <h2>Graph, ranking ve CV upload ayni is akisi icinde.</h2>
+            </div>
+            <div class="device-grid">
+              <article class="device-card" data-reveal>
+                <div class="device-screen graph-screen">
+                  <span class="graph-node g-main">Aday</span>
+                  <span class="graph-node g-skill">Python</span>
+                  <span class="graph-node g-exp">Fintech</span>
+                  <span class="graph-node g-cert">AWS</span>
+                  <i></i><i></i><i></i>
+                </div>
+                <h3>Bilgi grafi gorunumu</h3>
+                <p>Aday profili skill ve deneyim iliskileriyle okunur hale gelir.</p>
+              </article>
+              <article class="device-card" data-reveal>
+                <div class="device-screen ranking-screen">
+                  <div><b>92</b><span>Elif Yilmaz</span><small>5/5 must-have</small></div>
+                  <div><b>84</b><span>Mert Kaya</span><small>vector boost</small></div>
+                  <div><b>78</b><span>Deniz Koc</span><small>lokasyon uyumu</small></div>
+                </div>
+                <h3>Aday siralama</h3>
+                <p>IK sorgusu kontrollu QuerySpec'e cevrilir ve adaylar skorlu listelenir.</p>
+              </article>
+              <article class="device-card" data-reveal>
+                <div class="device-screen upload-screen">
+                  <div class="upload-box">
+                    <strong>CV yukle</strong>
+                    <span>PDF / DOCX</span>
+                  </div>
+                  <p>Extraction complete</p>
+                  <div class="progress"><span></span></div>
+                </div>
+                <h3>CV isleme</h3>
+                <p>Dosyalar R2'de saklanir, yapisal ciktilar graph katmanina yazilir.</p>
+              </article>
+            </div>
+          </section>
+
+          <section id="explain" class="section explain">
+            <div class="explain-copy" data-reveal>
+              <p class="eyebrow">Explainable matching</p>
+              <h2>Sadece skor degil, neden o skor?</h2>
+              <p>
+                Her aday icin zorunlu yetenek, kidem, deneyim, lokasyon ve semantik benzerlik
+                kirilimlari ayrica gosterilir. Must-have gate ve fuzzy skill matching aday
+                kalitesini daha tutarli hale getirir.
+              </p>
+              <button class="primary-btn" type="button" data-route="login">Dashboard'a gec</button>
+            </div>
+            <div class="explain-panel" data-reveal>
+              <div class="score-ring"><span>92</span></div>
+              <ul>
+                <li><b>Zorunlu skill</b><span>Python, FastAPI, AWS</span></li>
+                <li><b>Vektor sinyali</b><span>Backend fintech deneyimi</span></li>
+                <li><b>Graph kaniti</b><span>Experience -> Company -> Industry</span></li>
+                <li><b>Eksik sinyal</b><span>CKA sertifikasi yok</span></li>
+              </ul>
+            </div>
+          </section>
+
+          <section id="faq" class="section faq">
+            <div class="section-heading" data-reveal>
+              <p class="eyebrow">SSS</p>
+              <h2>Sik sorulan sorular.</h2>
+            </div>
+            <div class="faq-list" data-reveal>
+              <button class="faq-item" type="button">
+                <span>PostgreSQL neden gerekli?</span>
+                <p>Kullanici, rol, organizasyon, ilan ve kayitli arama gibi urun verileri icin.</p>
+              </button>
+              <button class="faq-item" type="button">
+                <span>Neo4j nerede kullaniliyor?</span>
+                <p>Aday bilgi grafi, iliski sorgulari, vector index ve explainable matching katmaninda.</p>
+              </button>
+              <button class="faq-item" type="button">
+                <span>Aday paneli ne yapacak?</span>
+                <p>CV yukleme, profil tamamlama, basvuru durumu ve eslesme geri bildirimi icin.</p>
+              </button>
+            </div>
+          </section>
+
+          <section class="cta-band" data-reveal>
+            <h2>Bitirme projesinden production-ready HR platformuna.</h2>
+            <button class="primary-btn inverse" type="button" data-route="login">Baslayin</button>
+          </section>
+        </section>
+
+        <section id="auth-view" class="view auth-layout" aria-label="TalentForge giris">
+          <div class="auth-art">
+            <button class="back-link" type="button" data-route="landing">Ana sayfaya don</button>
+            <h1>Rolune gore TalentForge deneyimini ac.</h1>
+            <p>IK ekipleri aday havuzunu arar, adaylar CV ve profil bilgilerini yonetir.</p>
+            <div class="role-toggle" role="group" aria-label="Rol secimi">
+              <button class="role-option active" type="button" data-role="hr">IK olarak gir</button>
+              <button class="role-option" type="button" data-role="candidate">Aday olarak gir</button>
+            </div>
+          </div>
+          <div class="auth-card">
+            <div class="auth-tabs">
+              <button class="active" type="button" data-auth-tab="login">Giris</button>
+              <button type="button" data-auth-tab="register">Kayit ol</button>
+              <button type="button" data-auth-tab="forgot">Sifremi unuttum</button>
+            </div>
+
+            <form class="auth-form active" data-auth-panel="login">
+              <label>E-posta<input type="email" placeholder="ik@firma.com" required /></label>
+              <label>Sifre<input type="password" placeholder="••••••••" required /></label>
+              <button class="primary-btn full" type="submit">Giris yap</button>
+            </form>
+
+            <form class="auth-form" data-auth-panel="register">
+              <label>Ad Soyad<input type="text" placeholder="Gizem Ozdemir" required /></label>
+              <div class="role-fields active" data-register-role="hr">
+                <label>Sirket adi<input type="text" placeholder="TalentForge Labs" required /></label>
+                <label>Sirket e-postasi<input type="email" placeholder="gizem@talentforge.ai" required /></label>
+                <label>Pozisyon<input type="text" placeholder="Talent Acquisition Specialist" /></label>
+              </div>
+              <div class="role-fields" data-register-role="candidate">
+                <label>E-posta<input type="email" placeholder="aday@mail.com" required /></label>
+                <label>Okul<input type="text" placeholder="Marmara Universitesi" /></label>
+                <label>Meslek / hedef rol<input type="text" placeholder="Backend Developer" /></label>
+                <label>Tecrube yili<input type="number" min="0" max="40" placeholder="2" /></label>
+              </div>
+              <label>Sifre<input type="password" placeholder="En az 8 karakter" required /></label>
+              <button class="primary-btn full" type="submit">Hesap olustur</button>
+            </form>
+
+            <form class="auth-form" data-auth-panel="forgot">
+              <label>E-posta<input type="email" placeholder="hesap e-postasi" required /></label>
+              <button class="primary-btn full" type="submit">Sifirlama baglantisi gonder</button>
+            </form>
+            <p class="auth-message" aria-live="polite"></p>
+          </div>
+        </section>
+
+        <section id="dashboard-view" class="view dashboard-view" aria-label="TalentForge dashboard">
+          <aside class="dash-nav">
+            <a class="brand" href="#dashboard" data-route="dashboard">
+              <img class="brand-logo" src="./tf_logo.png" alt="" width="38" height="38" />
+              <span>TalentForge</span>
+            </a>
+            <div class="dash-menu" data-menu-role="hr">
+              <button class="dash-link active" type="button" data-dash-tab="overview">Genel bakis</button>
+              <button class="dash-link" type="button" data-dash-tab="search">Aday arama</button>
+              <button class="dash-link" type="button" data-dash-tab="jobs">Ilanlar</button>
+              <button class="dash-link" type="button" data-dash-tab="shortlist">Shortlist</button>
+            </div>
+            <div class="dash-menu" data-menu-role="candidate">
+              <button class="dash-link active" type="button" data-dash-tab="overview">Genel bakis</button>
+              <button class="dash-link" type="button" data-dash-tab="profile">Profilim</button>
+              <button class="dash-link" type="button" data-dash-tab="matches">Eslesmeler</button>
+              <button class="dash-link" type="button" data-dash-tab="applications">Basvurular</button>
+            </div>
+            <button class="ghost-btn" type="button" data-route="landing">Cikis</button>
+          </aside>
+          <div class="dash-main">
+            <div class="dash-top">
+              <div>
+                <p class="eyebrow" id="dashboard-role-label">IK dashboard</p>
+                <h1 id="dashboard-title">Aday havuzunu yonet.</h1>
+              </div>
+              <button class="primary-btn small" type="button" data-top-action="search">Yeni arama</button>
+            </div>
+
+            <div id="hr-dashboard" class="role-dashboard active" data-role-dashboard="hr">
+              <div class="dashboard-panel active" data-panel="overview">
+                <div class="company-card">
+                  <div>
+                    <p class="eyebrow">Sirket profili</p>
+                    <h2>TalentForge Labs</h2>
+                    <p>talentforge.ai domaini dogrulandi. 4 IK kullanicisi, 12 aktif ilan.</p>
+                  </div>
+                  <span class="status-pill">Verified company mail</span>
+                </div>
+                <div class="metric-grid">
+                  <article><span>Aktif aday</span><strong>128</strong></article>
+                  <article><span>Kayitli arama</span><strong>14</strong></article>
+                  <article><span>Shortlist</span><strong>32</strong></article>
+                  <article><span>Ortalama skor</span><strong>81</strong></article>
+                </div>
+                <div class="dash-panels">
+                  <section class="dash-panel">
+                    <h2>Son eslesmeler</h2>
+                    <div class="rank-row hot"><span class="rank">01</span><div><strong>Senior Backend</strong><p>Elif Yilmaz / 92 / FastAPI + AWS</p></div><b>RRF</b></div>
+                    <div class="rank-row"><span class="rank">02</span><div><strong>Data Analyst</strong><p>Zeynep Demir / 88 / SQL + Power BI</p></div><b>KG</b></div>
+                    <div class="rank-row"><span class="rank">03</span><div><strong>DevOps</strong><p>Ege Gunes / 84 / Kubernetes</p></div><b>Vector</b></div>
+                  </section>
+                  <section class="dash-panel">
+                    <h2>Takim notlari</h2>
+                    <p>Bugun 6 CV islendi, 2 aday shortlist'e eklendi.</p>
+                    <p>Backend ilaninda CKA sertifikasi nice-to-have olarak guncellendi.</p>
+                  </section>
+                </div>
+              </div>
+
+              <div class="dashboard-panel" data-panel="search">
+                <div class="dash-panels wide-left">
+                  <section class="dash-panel">
+                    <h2>Dogal dil aday arama</h2>
+                    <div class="query-box">5 yil Python ve AWS deneyimi olan, Istanbul'da yasayan senior backend muhendisi ara.</div>
+                    <div class="query-spec">
+                      <span>must: Python, AWS</span>
+                      <span>seniority: senior</span>
+                      <span>location: Istanbul</span>
+                      <span>min_exp: 5</span>
+                    </div>
+                  </section>
+                  <section class="dash-panel">
+                    <h2>Kayitli aramalar</h2>
+                    <p>Senior Python Istanbul</p>
+                    <p>Mobile Flutter Remote</p>
+                    <p>Cybersecurity ISO 27001</p>
+                  </section>
+                </div>
+                <div class="candidate-table">
+                  <div class="table-row head"><span>Aday</span><span>Skor</span><span>Aciklama</span><span>Aksiyon</span></div>
+                  <div class="table-row"><span>Elif Yilmaz</span><span>92</span><span>5/5 must-have, vector boost</span><button>Shortlist</button></div>
+                  <div class="table-row"><span>Mert Kaya</span><span>84</span><span>Microservices fuzzy match</span><button>Incele</button></div>
+                  <div class="table-row"><span>Deniz Koc</span><span>78</span><span>Lokasyon uyumlu, sertifika eksik</span><button>Not al</button></div>
+                </div>
+              </div>
+
+              <div class="dashboard-panel" data-panel="jobs">
+                <div class="dash-panels">
+                  <section class="dash-panel">
+                    <h2>Yeni ilan taslagi</h2>
+                    <div class="form-preview">
+                      <span>Pozisyon: Senior Backend Engineer</span>
+                      <span>Departman: Platform</span>
+                      <span>Calisma tipi: Hybrid / Istanbul</span>
+                      <span>Must-have: Python, FastAPI, AWS</span>
+                    </div>
+                  </section>
+                  <section class="dash-panel">
+                    <h2>Ilan durumu</h2>
+                    <p>Senior Backend Engineer - 38 aday</p>
+                    <p>Data Analyst - 24 aday</p>
+                    <p>Mobile Developer - 17 aday</p>
+                  </section>
+                </div>
+              </div>
+
+              <div class="dashboard-panel" data-panel="shortlist">
+                <div class="pipeline">
+                  <article><h3>Yeni</h3><p>Elif Yilmaz</p><p>Can Sahin</p></article>
+                  <article><h3>IK gorusmesi</h3><p>Mert Kaya</p><p>Naz Kilic</p></article>
+                  <article><h3>Teknik</h3><p>Ege Gunes</p></article>
+                  <article><h3>Teklif</h3><p>Zeynep Demir</p></article>
+                </div>
+              </div>
+            </div>
+
+            <div id="candidate-dashboard" class="role-dashboard" data-role-dashboard="candidate">
+              <div class="dashboard-panel active" data-panel="overview">
+                <div class="profile-hero">
+                  <div>
+                    <p class="eyebrow">Aday profili</p>
+                    <h2>Gizem Ozdemir</h2>
+                    <p>Backend Developer / Marmara Universitesi / 2 yil deneyim</p>
+                  </div>
+                  <span class="status-pill">CV islendi</span>
+                </div>
+                <div class="metric-grid">
+                  <article><span>Profil doluluk</span><strong>76%</strong></article>
+                  <article><span>Uygun ilan</span><strong>9</strong></article>
+                  <article><span>Basvuru</span><strong>4</strong></article>
+                  <article><span>Geri bildirim</span><strong>3</strong></article>
+                </div>
+                <div class="dash-panels">
+                  <section class="dash-panel">
+                    <h2>Profil sinyalleri</h2>
+                    <p>Python, FastAPI ve AWS becerileri guclu.</p>
+                    <p>Lokasyon tercihi ve dil seviyesi tamamlanmali.</p>
+                    <div class="progress"><span></span></div>
+                  </section>
+                  <section class="dash-panel">
+                    <h2>Onerilen pozisyonlar</h2>
+                    <div class="rank-row hot"><span class="rank">01</span><div><strong>Backend Engineer</strong><p>92 uyum skoru</p></div><b>Yeni</b></div>
+                    <div class="rank-row"><span class="rank">02</span><div><strong>Platform Engineer</strong><p>84 uyum skoru</p></div><b>Takip</b></div>
+                  </section>
+                </div>
+              </div>
+
+              <div class="dashboard-panel" data-panel="profile">
+                <div class="dash-panels">
+                  <section class="dash-panel">
+                    <h2>Temel bilgiler</h2>
+                    <div class="form-preview">
+                      <span>Okul: Marmara Universitesi</span>
+                      <span>Bolum: Bilgisayar Muhendisligi</span>
+                      <span>Meslek: Backend Developer</span>
+                      <span>Tecrube: 2 yil</span>
+                      <span>Lokasyon: Istanbul / Remote acik</span>
+                    </div>
+                  </section>
+                  <section class="dash-panel">
+                    <h2>CV ve yetenekler</h2>
+                    <p>CV: gizem_ozdemir_cv.pdf</p>
+                    <p>Skill graph: Python, FastAPI, PostgreSQL, Docker</p>
+                    <p>Eksik: Ingilizce seviye, portfolyo linki</p>
+                  </section>
+                </div>
+              </div>
+
+              <div class="dashboard-panel" data-panel="matches">
+                <div class="candidate-table">
+                  <div class="table-row head"><span>Pozisyon</span><span>Skor</span><span>Neden uydu?</span><span>Durum</span></div>
+                  <div class="table-row"><span>Backend Engineer</span><span>92</span><span>Python + FastAPI + Istanbul</span><button>Basvur</button></div>
+                  <div class="table-row"><span>Platform Engineer</span><span>84</span><span>Docker + AWS sinyali</span><button>Kaydet</button></div>
+                  <div class="table-row"><span>Data Engineer</span><span>73</span><span>SQL guclu, Spark eksik</span><button>Incele</button></div>
+                </div>
+              </div>
+
+              <div class="dashboard-panel" data-panel="applications">
+                <div class="timeline">
+                  <article><span>Bugun</span><h3>Backend Engineer</h3><p>CV inceleniyor</p></article>
+                  <article><span>Dun</span><h3>Platform Engineer</h3><p>IK gorusmesi planlandi</p></article>
+                  <article><span>20 Mayis</span><h3>Data Analyst</h3><p>Geri bildirim alindi</p></article>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <span>TalentForge</span>
+        <span>Gizem Ozdemir / Muhammed Emin Solakoglu / Emre Kilic</span>
+      </footer>
+    </div>
+
+    <script src="./app.js?v=20260605-6"></script>
+  </body>
+</html>

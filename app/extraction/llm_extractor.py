@@ -3,7 +3,7 @@ LLM ile CV'den yapılandırılmış bilgi çıkaran sınıf.
 Few-shot + Chain-of-Thought + Semantic Inference prompt stratejisi kullanır.
 
 Desteklenen backend'ler (.env'de tanımlı API key'e göre otomatik seçilir):
-  Öncelik: GROQ_API_KEY > HF_TOKEN
+  Öncelik: HF_TOKEN > GROQ_API_KEY
 """
 
 from typing import Optional
@@ -23,11 +23,48 @@ logger = logging.getLogger(__name__)
 def _build_client():
     """
     .env'deki API key'e göre uygun backend'i seçer.
-    Öncelik: GROQ_API_KEY > HF_TOKEN
+    Öncelik: HF_TOKEN > GROQ_API_KEY
     Döndürür: (instructor_client, model_name, backend_name)
     """
+    preferred_backend = os.getenv("LLM_BACKEND", "").lower().strip()
     groq_key = os.getenv("GROQ_API_KEY")
     hf_token = os.getenv("HF_TOKEN")
+
+    if preferred_backend in {"hf", "huggingface"}:
+        if not hf_token:
+            raise ValueError("LLM_BACKEND=huggingface secildi ama HF_TOKEN bulunamadi.")
+        model = os.getenv("LLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
+        client = instructor.from_openai(
+            OpenAI(
+                base_url="https://router.huggingface.co/v1",
+                api_key=hf_token,
+            ),
+            mode=instructor.Mode.JSON,
+        )
+        return client, model, "HuggingFace"
+
+    if preferred_backend == "groq":
+        if not groq_key:
+            raise ValueError("LLM_BACKEND=groq secildi ama GROQ_API_KEY bulunamadi.")
+        model = os.getenv("LLM_MODEL", "llama-3.1-8b-instant")
+        client = instructor.from_openai(
+            OpenAI(
+                base_url="https://api.groq.com/openai/v1",
+                api_key=groq_key,
+            )
+        )
+        return client, model, "Groq"
+
+    if hf_token:
+        model = os.getenv("LLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
+        client = instructor.from_openai(
+            OpenAI(
+                base_url="https://router.huggingface.co/v1",
+                api_key=hf_token,
+            ),
+            mode=instructor.Mode.JSON,  # ← bunu ekle
+        )
+        return client, model, "HuggingFace"
 
     if groq_key:
         model = os.getenv("LLM_MODEL", "llama-3.1-8b-instant")
@@ -38,17 +75,6 @@ def _build_client():
             )
         )
         return client, model, "Groq"
-
-    elif hf_token:
-        model = os.getenv("LLM_MODEL", "Qwen/Qwen2.5-7B-Instruct")
-        client = instructor.from_openai(
-            OpenAI(
-                base_url="https://router.huggingface.co/v1",
-                api_key=hf_token,
-            ),
-            mode=instructor.Mode.JSON,  # ← bunu ekle
-        )
-        return client, model, "HuggingFace"
 
     else:
         raise ValueError(

@@ -7,6 +7,7 @@ Model: paraphrase-multilingual-MiniLM-L12-v2 (384 boyut, Türkçe+İngilizce)
 
 import os
 import logging
+import math
 from typing import List, Optional
 
 import requests as http_requests
@@ -16,7 +17,10 @@ logger = logging.getLogger(__name__)
 
 # ── Sabitler ──────────────────────────────────────────────────────────
 
-_HF_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+_HF_MODEL = os.getenv(
+    "HF_EMBEDDING_MODEL",
+    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+)
 _DIMENSIONS = 384
 _local_model = None
 
@@ -28,13 +32,27 @@ def get_dimensions() -> int:
 
 
 def generate_embedding(text: str) -> List[float]:
-    """Embedding üretir — önce HF API, başarısız olursa lokal model"""
+    """Embedding üretir.
+
+    EMBEDDING_BACKEND=huggingface/hf ise sadece HF API kullanır.
+    EMBEDDING_BACKEND=local ise sadece lokal model kullanır.
+    Varsayılan auto modunda HF başarısız olursa lokal fallback yapar.
+    """
+    backend = os.getenv("EMBEDDING_BACKEND", "auto").lower().strip()
     hf_token = os.getenv("HF_TOKEN")
+
+    if backend in {"local", "sentence-transformers"}:
+        return _embed_local(text)
+
+    if backend in {"huggingface", "hf"} and not hf_token:
+        raise ValueError("EMBEDDING_BACKEND=huggingface secildi ama HF_TOKEN bulunamadi")
 
     if hf_token:
         try:
             return _embed_via_api(text, hf_token)
         except Exception as e:
+            if backend in {"huggingface", "hf"}:
+                raise
             logger.warning(f"⚠️ HF API embedding başarısız, lokal deneniyor: {e}")
 
     return _embed_local(text)
@@ -46,15 +64,48 @@ def generate_embeddings(texts: List[str]) -> List[List[float]]:
 
 
 def _embed_via_api(text: str, token: str) -> List[float]:
-    """HuggingFace Inference API ile embedding (RAM kullanmaz)"""
+    """HuggingFace Router / HF Inference ile embedding (RAM kullanmaz)"""
     response = http_requests.post(
-        f"https://api-inference.huggingface.co/pipeline/feature-extraction/{_HF_MODEL}",
+        f"https://router.huggingface.co/hf-inference/models/{_HF_MODEL}/pipeline/feature-extraction",
         headers={"Authorization": f"Bearer {token}"},
         json={"inputs": text, "options": {"wait_for_model": True}},
         timeout=30,
     )
     response.raise_for_status()
-    return response.json()
+    return _normalize_embedding(_coerce_embedding(response.json()))
+
+
+def _coerce_embedding(payload) -> List[float]:
+    """HF feature-extraction yanıtını tek 384 boyutlu vektöre indirger."""
+    if isinstance(payload, dict) and "error" in payload:
+        raise RuntimeError(payload["error"])
+
+    if not isinstance(payload, list) or not payload:
+        raise RuntimeError("HF embedding yaniti beklenen formatta degil")
+
+    if all(isinstance(x, (int, float)) for x in payload):
+        return [float(x) for x in payload]
+
+    if all(isinstance(row, list) for row in payload):
+        rows = payload
+        if rows and rows[0] and isinstance(rows[0][0], list):
+            rows = rows[0]
+        if not rows:
+            raise RuntimeError("HF embedding yaniti bos")
+        dims = len(rows[0])
+        return [
+            sum(float(row[i]) for row in rows if len(row) == dims) / len(rows)
+            for i in range(dims)
+        ]
+
+    raise RuntimeError("HF embedding yaniti beklenen formatta degil")
+
+
+def _normalize_embedding(vector: List[float]) -> List[float]:
+    norm = math.sqrt(sum(value * value for value in vector))
+    if not norm:
+        return vector
+    return [value / norm for value in vector]
 
 
 def _embed_local(text: str) -> List[float]:
