@@ -183,6 +183,19 @@ class CandidateMatcher:
                 OPTIONAL MATCH (c)-[:HAS_CERTIFICATION]->(ct:Certification)
                 WITH c, skills, experiences, educations, languages, collect(ct.name) AS certifications
 
+                OPTIONAL MATCH (c)-[:HAS_PROJECT]->(p:Project)
+                WITH c, skills, experiences, educations, languages, certifications, collect({
+                    name: p.name,
+                    description: p.description,
+                    role: p.role,
+                    start_date: p.start_date,
+                    end_date: p.end_date,
+                    url: p.url,
+                    confidence: p.confidence
+                }) AS raw_projects
+                WITH c, skills, experiences, educations, languages, certifications,
+                     [x IN raw_projects WHERE x.name IS NOT NULL] AS projects
+
                 RETURN
                     c.name AS name,
                     c.email AS email,
@@ -194,7 +207,8 @@ class CandidateMatcher:
                     experiences,
                     educations,
                     languages,
-                    certifications
+                    certifications,
+                    projects
             """)
             return [record.data() for record in result]
 
@@ -215,6 +229,7 @@ class CandidateMatcher:
             "title": 0.10,
             "experience": 0.10,
             "education": 0.08,
+            "education_institution": 0.08,
             "location": 0.07,
             "languages": 0.05,
             "certifications": 0.05,
@@ -249,6 +264,12 @@ class CandidateMatcher:
 
         if query.education_level:
             add_criterion("education", self._score_education(candidate, query.education_level))
+
+        if query.education_institutions:
+            add_criterion(
+                "education_institution",
+                self._score_education_institution(candidate, query.education_institutions),
+            )
 
         if query.locations:
             add_criterion("location", self._score_location(candidate, query.locations))
@@ -504,6 +525,49 @@ class CandidateMatcher:
 
         return max_level if max_level > 0 else 1
 
+    def _score_education_institution(self, candidate: Dict, institutions: List[str]) -> Tuple[float, str]:
+        """Okul/kurum adi eslestirmesi. Orn: ODTU, Marmara, Bogazici."""
+        if not institutions:
+            return 1.0, None
+
+        candidate_institutions = [
+            edu.get("institution") or ""
+            for edu in candidate.get("educations", [])
+            if edu.get("institution")
+        ]
+        candidate_norms = {_normalize_turkish(name) for name in candidate_institutions}
+        matched = []
+        missing = []
+
+        for institution in institutions:
+            institution_norm = _normalize_turkish(institution)
+            is_match = institution_norm in candidate_norms or any(
+                institution_norm in candidate_name or candidate_name in institution_norm
+                for candidate_name in candidate_norms
+            )
+            if not is_match:
+                try:
+                    from rapidfuzz import fuzz
+                    is_match = any(
+                        fuzz.ratio(institution_norm, candidate_name) > 78
+                        for candidate_name in candidate_norms
+                    )
+                except Exception:
+                    is_match = False
+
+            if is_match:
+                matched.append(institution)
+            else:
+                missing.append(institution)
+
+        score = len(matched) / len(institutions)
+        detail = f"Egitim kurumu: {len(matched)}/{len(institutions)}"
+        if matched:
+            detail += f" ✓ {', '.join(matched)}"
+        if missing:
+            detail += f" ✗ {', '.join(missing)}"
+        return score, detail
+
     def _score_location(self, candidate: Dict, locations: List[str]) -> Tuple[float, str]:
         """Lokasyon eşleştirmesi (Türkçe karakter uyumlu)"""
         if not locations:
@@ -599,6 +663,8 @@ class CandidateMatcher:
             parts.append(", ".join(query.must_have_skills))
         if query.nice_to_have_skills:
             parts.append(", ".join(query.nice_to_have_skills))
+        if query.education_institutions:
+            parts.append("Education institutions: " + ", ".join(query.education_institutions))
         if query.free_text:
             parts.append(query.free_text)
         return ". ".join(parts)

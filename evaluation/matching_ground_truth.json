@@ -1,0 +1,368 @@
+[
+  {
+    "query_id": "q_backend_java",
+    "query_text": "Java Spring Boot PostgreSQL Redis Kafka Docker ve Microservices zorunlu olan senior backend developer arıyoruz.",
+    "strong_expected": [
+      {
+        "cv_id": "cv_063",
+        "candidate_name": "Daniel Taylor",
+        "title": "Senior Backend Developer"
+      }
+    ],
+    "partial_expected": [
+      {
+        "cv_id": "cv_007",
+        "candidate_name": "İrem Şahin",
+        "title": "Junior Backend Developer"
+      },
+      {
+        "cv_id": "cv_086",
+        "candidate_name": "Can Şahin",
+        "title": "Senior Full Stack Developer"
+      }
+    ]
+  },
+  {
+    "query_id": "q_ml_ai",
+    "query_text": "Python PyTorch TensorFlow MLOps MLflow FastAPI ve Docker bilen ML AI engineer arıyoruz.",
+    "strong_expected": [
+      {
+        "cv_id": "cv_012",
+        "candidate_name": "Kerem Kaplan",
+        "title": "Senior Data Scientist"
+      },
+      {
+        "cv_id": "cv_022",
+        "candidate_name": "Yasemin Uçar",
+        "title": "AI Product Analytics Manager"
+      },
+      {
+        "cv_id": "cv_040",
+        "candidate_name": "Sophia Wilson",
+        "title": "ML Tech Lead"
+      },
+      {
+        "cv_id": "cv_066",
+        "candidate_name": "Tuğçe Avcı",
+        "title": "Veri Analisti"
+      },
+      {
+        "cv_id": "cv_070",
+        "candidate_name": "Lara Arslan",
+        "title": "Junior Data Analyst"
+      },
+      {
+        "cv_id": "cv_092",
+        "candidate_name": "Gökhan Arslan",
+        "title": "Senior ML Engineer"
+      }
+    ],
+    "partial_expected": []
+  },
+  {
+    "query_id": "q_devops",
+    "query_text": "AWS Kubernetes Docker Terraform Jenkins Prometheus Grafana bilen DevOps mühendisi arıyoruz.",
+    "strong_expected": [
+      {
+        "cv_id": "cv_028",
+        "candidate_name": "Buse Koç",
+        "title": "DevOps Team Lead"
+      },
+      {
+        "cv_id": "cv_042",
+        "candidate_name": "Defne Avcı",
+        "title": "Senior DevOps Engineer"
+      },
+      {
+        "cv_id": "cv_082",
+        "candidate_name": "Tuna Erdoğan",
+        "title": "DevOps Engineer"
+      },
+      {
+        "cv_id": "cv_094",
+        "candidate_name": "Bora Koç",
+        "title": "Senior Cyber Security Specialist"
+      }
+    ],
+    "partial_expected": []
+  },
+  {
+    "query_id": "q_frontend",
+    "query_text": "React Next.js TypeScript Redux Tailwind ve test yazabilen frontend developer arıyoruz.",
+    "strong_expected": [],
+    "partial_expected": [
+      {
+        "cv_id": "cv_004",
+        "candidate_name": "Fatma Turan",
+        "title": "Junior Full Stack Developer"
+      },
+      {
+        "cv_id": "cv_031",
+        "candidate_name": "Arda Eren",
+        "title": "Backend Developer"
+      },
+      {
+        "cv_id": "cv_049",
+        "candidate_name": "Aylin Uçar",
+        "title": "Full Stack Developer"
+      },
+      {
+        "cv_id": "cv_053",
+        "candidate_name": "Elif Bulut",
+        "title": "Senior Backend Developer"
+      },
+      {
+        "cv_id": "cv_071",
+        "candidate_name": "Tuna Aydın",
+        "title": "Junior Backend Developer"
+      },
+      {
+        "cv_id": "cv_098",
+        "candidate_name": "Lara Bulut",
+        "title": "Tech Lead Backend"
+      }
+    ]
+  },
+  {
+    "query_id": "q_cyber",
+    "query_text": "SOC SIEM Splunk Linux Firewall Incident Response ISO 27001 bilen cybersecurity analyst arıyoruz.",
+    "strong_expected": [
+      {
+        "cv_id": "cv_059",
+        "candidate_name": "Yusuf Arslan",
+        "title": "Siber Güvenlik Uzmanı"
+      },
+      {
+        "cv_id": "cv_061",
+        "candidate_name": "Baran Sezer",
+        "title": "QA Automation Engineer"
+      },
+      {
+        "cv_id": "cv_077",
+        "candidate_name": "Can Turan",
+        "title": "DevOps Team Lead"
+      },
+      {
+        "cv_id": "cv_083",
+        "candidate_name": "Sena Kara",
+        "title": "Senior QA Automation Engineer"
+      }
+    ],
+    "partial_expected": []
+  },
+  {
+    "query_id": "q_product",
+    "query_text": "Roadmap Jira Agile SQL A/B Testing Amplitude ve stakeholder management bilen product owner arıyoruz.",
+    "strong_expected": [
+      {
+        "cv_id": "cv_020",
+        "candidate_name": "Laura Claire",
+        "title": "Product Intern"
+      },
+      {
+        "cv_id": "cv_030",
+        "candidate_name": "Ekin Kara",
+        "title": "Business Analyst"
+      },
+      {
+        "cv_id": "cv_050",
+        "candidate_name": "Ömer Taş",
+        "title": "Junior Product Specialist"
+      },
+      {
+        "cv_id": "cv_096",
+        "candidate_name": "Lara Demir",
+        "title": "Product Manager"
+      }
+    ],
+    "partial_expected": [
+      {
+        "cv_id": "cv_021",
+        "candidate_name": "Defne Çetin",
+        "title": "Business Analyst"
+      },
+      {
+        "cv_id": "cv_023",
+        "candidate_name": "Ekin Turan",
+        "title": "Stajyer İş Analisti"
+      },
+      {
+        "cv_id": "cv_041",
+        "candidate_name": "Emir Uçar",
+        "title": "Senior Product Manager"
+      },
+      {
+        "cv_id": "cv_095",
+        "candidate_name": "Ekin Kaplan",
+        "title": "Kıdemli İş Analisti"
+      }
+    ]
+  },
+  {
+    "query_id": "q_finance",
+    "query_text": "Financial Modeling Excel Power BI SQL Budgeting Forecasting ve IFRS bilen finansal analist arıyoruz.",
+    "strong_expected": [
+      {
+        "cv_id": "cv_016",
+        "candidate_name": "David Miller",
+        "title": "Muhasebe Stajyeri"
+      },
+      {
+        "cv_id": "cv_026",
+        "candidate_name": "Baran Turan",
+        "title": "Finance Manager"
+      }
+    ],
+    "partial_expected": [
+      {
+        "cv_id": "cv_006",
+        "candidate_name": "Naz Avcı",
+        "title": "Junior Accountant"
+      },
+      {
+        "cv_id": "cv_017",
+        "candidate_name": "Gökhan Yılmaz",
+        "title": "Senior Auditor"
+      },
+      {
+        "cv_id": "cv_032",
+        "candidate_name": "Ozan Kurt",
+        "title": "Financial Analyst"
+      },
+      {
+        "cv_id": "cv_038",
+        "candidate_name": "Ekin Tekin",
+        "title": "Senior Financial Analyst"
+      },
+      {
+        "cv_id": "cv_052",
+        "candidate_name": "Yunus Kara",
+        "title": "Senior Auditor"
+      },
+      {
+        "cv_id": "cv_054",
+        "candidate_name": "Ela Kılıç",
+        "title": "Senior Auditor"
+      }
+    ]
+  },
+  {
+    "query_id": "q_hr",
+    "query_text": "Recruitment Onboarding Performance Management HR Analytics ve SAP SuccessFactors bilen İK iş ortağı arıyoruz.",
+    "strong_expected": [
+      {
+        "cv_id": "cv_043",
+        "candidate_name": "Yusuf Kaya",
+        "title": "Junior Recruiter"
+      },
+      {
+        "cv_id": "cv_044",
+        "candidate_name": "Defne Öztürk",
+        "title": "Kıdemli İK İş Ortağı"
+      },
+      {
+        "cv_id": "cv_056",
+        "candidate_name": "Dilara Demir",
+        "title": "Talent Acquisition Lead"
+      },
+      {
+        "cv_id": "cv_068",
+        "candidate_name": "Emily Davis",
+        "title": "Talent Acquisition Intern"
+      }
+    ],
+    "partial_expected": [
+      {
+        "cv_id": "cv_001",
+        "candidate_name": "Berk Güler",
+        "title": "HR Generalist"
+      },
+      {
+        "cv_id": "cv_002",
+        "candidate_name": "Liam Taylor",
+        "title": "Junior Recruiter"
+      },
+      {
+        "cv_id": "cv_036",
+        "candidate_name": "Deniz Kurt",
+        "title": "Junior HR Specialist"
+      }
+    ]
+  },
+  {
+    "query_id": "q_ux",
+    "query_text": "Figma User Research Wireframe Prototype Design System ve Usability Testing bilen UI UX designer arıyoruz.",
+    "strong_expected": [
+      {
+        "cv_id": "cv_003",
+        "candidate_name": "Berk Eren",
+        "title": "Content Intern"
+      },
+      {
+        "cv_id": "cv_069",
+        "candidate_name": "İdil Aydın",
+        "title": "Senior UI/UX Designer"
+      },
+      {
+        "cv_id": "cv_076",
+        "candidate_name": "Lara Eren",
+        "title": "Senior UI/UX Designer"
+      }
+    ],
+    "partial_expected": [
+      {
+        "cv_id": "cv_018",
+        "candidate_name": "Arda Aslan",
+        "title": "Senior UI/UX Designer"
+      },
+      {
+        "cv_id": "cv_074",
+        "candidate_name": "Ahmet Yılmaz",
+        "title": "Junior UI/UX Designer"
+      },
+      {
+        "cv_id": "cv_084",
+        "candidate_name": "Liam Johnson",
+        "title": "Design Lead"
+      }
+    ]
+  },
+  {
+    "query_id": "q_supply",
+    "query_text": "SAP MM WMS Inventory Management Demand Planning Excel Power BI bilen supply chain specialist arıyoruz.",
+    "strong_expected": [
+      {
+        "cv_id": "cv_039",
+        "candidate_name": "Yağmur Özdemir",
+        "title": "Operations Manager"
+      },
+      {
+        "cv_id": "cv_091",
+        "candidate_name": "Olivia Claire",
+        "title": "Lojistik Uzmanı"
+      }
+    ],
+    "partial_expected": [
+      {
+        "cv_id": "cv_027",
+        "candidate_name": "Defne Taş",
+        "title": "Lojistik Stajyeri"
+      },
+      {
+        "cv_id": "cv_029",
+        "candidate_name": "Melis Kılıç",
+        "title": "Junior Operations Specialist"
+      },
+      {
+        "cv_id": "cv_065",
+        "candidate_name": "Mehmet Bozkurt",
+        "title": "Operations Specialist"
+      },
+      {
+        "cv_id": "cv_079",
+        "candidate_name": "Bora Çetin",
+        "title": "Lojistik Uzmanı"
+      }
+    ]
+  }
+]

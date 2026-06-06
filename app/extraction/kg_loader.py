@@ -98,6 +98,34 @@ class KGLoader:
                  field=edu.field, start_year=edu.start_year, 
                  end_year=edu.end_year, gpa=edu.gpa)
             
+        # Projeler
+        for project in (extraction.projects or []):
+            project_id = str(uuid.uuid4())
+            tx.run("""
+                MATCH (c:Candidate {id: $cv_id})
+                CREATE (p:Project {id: $project_id})
+                SET p.name = $name,
+                    p.description = $description,
+                    p.role = $role,
+                    p.start_date = $start_date,
+                    p.end_date = $end_date,
+                    p.url = $url,
+                    p.evidence_text = $evidence_text,
+                    p.confidence = $confidence
+                MERGE (c)-[:HAS_PROJECT]->(p)
+            """, cv_id=cv_id, project_id=project_id, name=project.name,
+                 description=project.description, role=project.role,
+                 start_date=project.start_date, end_date=project.end_date,
+                 url=project.url, evidence_text=project.evidence_text,
+                 confidence=project.confidence)
+
+            for skill in (project.skills_used or []):
+                tx.run("""
+                    MATCH (p:Project {id: $project_id})
+                    MERGE (s:Skill {name: $skill_name})
+                    MERGE (p)-[:USED_SKILL]->(s)
+                """, project_id=project_id, skill_name=skill)
+
         # Diller
         for lang in (extraction.languages or []):
             tx.run("""

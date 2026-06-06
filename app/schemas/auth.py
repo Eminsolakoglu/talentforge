@@ -22,7 +22,7 @@ class LoginRequest(BaseModel):
 
 class JobCreateRequest(BaseModel):
     title: str = Field(min_length=2, max_length=180)
-    description: str = Field(min_length=10)
+    description: str = Field(min_length=2)
     location: str | None = None
     seniority: str | None = None
     min_experience_years: int = Field(default=0, ge=0, le=50)
@@ -33,3 +33,15 @@ class JobCreateRequest(BaseModel):
 
 class ApplicationCreateRequest(BaseModel):
     cover_letter: str | None = None
+
+
+class SavedSearchCreateRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=160)
+    query_spec: dict = Field(default_factory=dict)
+
+
+class ShortlistCreateRequest(BaseModel):
+    neo4j_candidate_id: str = Field(min_length=1, max_length=120)
+    candidate_name: str | None = None
+    score: float | None = None
+    notes: str | None = None

@@ -166,6 +166,17 @@ def build_candidate_summary(candidate_data: dict) -> str:
         if edu_strs:
             parts.append("Education: " + "; ".join(edu_strs))
 
+    projects = candidate_data.get("projects", [])
+    if projects:
+        project_strs = []
+        for project in projects:
+            name = project.get("name", "")
+            description = project.get("description", "")
+            if name:
+                project_strs.append(f"{name}: {description}" if description else name)
+        if project_strs:
+            parts.append("Projects: " + "; ".join(project_strs))
+
     # Lokasyon
     if candidate_data.get("location"):
         parts.append(f"Location: {candidate_data['location']}")
@@ -216,8 +227,13 @@ class EmbeddingService:
                     degree: ed.degree, field: ed.field, institution: i.name
                 }) AS educations
 
+                OPTIONAL MATCH (c)-[:HAS_PROJECT]->(p:Project)
+                WITH c, skills, experiences, educations, collect({
+                    name: p.name, description: p.description, role: p.role
+                }) AS projects
+
                 RETURN c.name AS name, c.summary AS summary, c.location AS location,
-                       skills, experiences, educations
+                       skills, experiences, educations, projects
             """, id=candidate_id)
 
             record = result.single()

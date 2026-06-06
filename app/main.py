@@ -11,6 +11,7 @@ import tempfile
 import os
 import hashlib
 import mimetypes
+import json
 from typing import List, Dict
 from jose import JWTError, jwt
 from sqlalchemy import func
@@ -29,6 +30,8 @@ from app.models.postgres import (
     JobApplication,
     JobPost,
     Organization,
+    SavedSearch,
+    Shortlist,
     User,
 )
 from app.schemas.auth import (
@@ -36,6 +39,8 @@ from app.schemas.auth import (
     JobCreateRequest,
     LoginRequest,
     RegisterRequest,
+    SavedSearchCreateRequest,
+    ShortlistCreateRequest,
 )
 from app.schemas.query import QuerySpec
 from app.query.matcher import CandidateMatcher
@@ -140,6 +145,7 @@ def serialize_user(user: User) -> dict:
 
 
 def serialize_job(job: JobPost, application: JobApplication | None = None) -> dict:
+    application_count = len(job.applications) if job.applications is not None else 0
     return {
         "id": job.id,
         "title": job.title,
@@ -151,17 +157,31 @@ def serialize_job(job: JobPost, application: JobApplication | None = None) -> di
         "nice_to_have_skills": job.nice_to_have_skills,
         "status": job.status,
         "organization": job.organization.name if job.organization else None,
+        "application_count": application_count,
         "application": serialize_application(application) if application else None,
     }
 
 
 def serialize_application(application: JobApplication) -> dict:
+    candidate = application.candidate
     return {
         "id": application.id,
         "status": application.status,
         "match_score": application.match_score,
         "match_breakdown": application.match_breakdown,
         "cover_letter": application.cover_letter,
+        "candidate": {
+            "id": candidate.id,
+            "neo4j_candidate_id": candidate.neo4j_candidate_id,
+            "name": candidate.user.full_name if candidate and candidate.user else None,
+            "email": candidate.user.email if candidate and candidate.user else None,
+            "school": candidate.school if candidate else None,
+            "profession": candidate.profession if candidate else None,
+            "experience_years": candidate.experience_years if candidate else None,
+            "location": candidate.location if candidate else None,
+        }
+        if candidate
+        else None,
         "job": {
             "id": application.job_post.id,
             "title": application.job_post.title,
@@ -170,6 +190,44 @@ def serialize_application(application: JobApplication) -> dict:
             else None,
             "location": application.job_post.location,
         },
+    }
+
+
+def serialize_saved_search(saved_search: SavedSearch) -> dict:
+    query_spec = saved_search.query_spec or {}
+    return {
+        "id": saved_search.id,
+        "title": saved_search.name,
+        "name": saved_search.name,
+        "mode": query_spec.get("mode") or "categorical",
+        "parsed": query_spec.get("parsed"),
+        "payload": query_spec.get("payload"),
+        "candidates": query_spec.get("candidates", []),
+        "created_at": saved_search.created_at.isoformat() if saved_search.created_at else None,
+    }
+
+
+def serialize_shortlist(shortlist: Shortlist) -> dict:
+    notes = shortlist.notes or ""
+    name = None
+    reason = notes
+    if notes.startswith("{"):
+        try:
+            import json
+            data = json.loads(notes)
+            name = data.get("candidate_name")
+            reason = data.get("reason") or ""
+        except Exception:
+            pass
+    return {
+        "id": shortlist.id,
+        "candidate_id": shortlist.neo4j_candidate_id,
+        "candidate_name": name,
+        "name": name or shortlist.neo4j_candidate_id,
+        "score": shortlist.score,
+        "reasons": [reason] if reason else [],
+        "stage": shortlist.stage,
+        "created_at": shortlist.created_at.isoformat() if shortlist.created_at else None,
     }
 
 
@@ -324,12 +382,23 @@ async def dashboard(
             if org_id
             else 0
         )
+        shortlist_count = (
+            db.query(Shortlist).filter(Shortlist.organization_id == org_id).count()
+            if org_id
+            else 0
+        )
+        saved_search_count = (
+            db.query(SavedSearch).filter(SavedSearch.organization_id == org_id).count()
+            if org_id
+            else 0
+        )
         return {
             "user": serialize_user(current_user),
+            "saved_searches": saved_search_count,
             "metrics": {
                 "active_jobs": active_jobs,
                 "applications": applications,
-                "shortlist": 0,
+                "shortlist": shortlist_count,
                 "average_score": 0,
             },
         }
@@ -408,6 +477,38 @@ async def create_job(
     return {"job": serialize_job(job)}
 
 
+@app.get("/jobs/{job_id}")
+async def job_detail(
+    job_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    require_role(current_user, "hr")
+    job = db.get(JobPost, job_id)
+    if not job or job.organization_id != current_user.organization_id:
+        raise HTTPException(status_code=404, detail="Ilan bulunamadi")
+    return {"job": serialize_job(job)}
+
+
+@app.get("/jobs/{job_id}/applications")
+async def job_applications(
+    job_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    require_role(current_user, "hr")
+    job = db.get(JobPost, job_id)
+    if not job or job.organization_id != current_user.organization_id:
+        raise HTTPException(status_code=404, detail="Ilan bulunamadi")
+    applications = (
+        db.query(JobApplication)
+        .filter(JobApplication.job_post_id == job.id)
+        .order_by(JobApplication.created_at.desc())
+        .all()
+    )
+    return {"applications": [serialize_application(application) for application in applications]}
+
+
 @app.post("/jobs/{job_id}/apply")
 async def apply_to_job(
     job_id: str,
@@ -468,6 +569,136 @@ async def my_applications(
         .all()
     )
     return {"applications": [serialize_application(application) for application in applications]}
+
+
+@app.get("/saved-searches")
+async def list_saved_searches(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    require_role(current_user, "hr")
+    if not current_user.organization_id:
+        return {"saved_searches": []}
+    searches = (
+        db.query(SavedSearch)
+        .filter(SavedSearch.organization_id == current_user.organization_id)
+        .order_by(SavedSearch.created_at.desc())
+        .all()
+    )
+    return {"saved_searches": [serialize_saved_search(search) for search in searches]}
+
+
+@app.post("/saved-searches")
+async def create_saved_search(
+    payload: SavedSearchCreateRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    require_role(current_user, "hr")
+    if not current_user.organization_id:
+        raise HTTPException(status_code=400, detail="Kayıtlı arama için şirket bağlantısı gerekli")
+    saved_search = SavedSearch(
+        organization_id=current_user.organization_id,
+        user_id=current_user.id,
+        name=payload.name,
+        query_spec=payload.query_spec,
+    )
+    db.add(saved_search)
+    db.commit()
+    db.refresh(saved_search)
+    return {"saved_search": serialize_saved_search(saved_search)}
+
+
+@app.delete("/saved-searches/{saved_search_id}")
+async def delete_saved_search(
+    saved_search_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    require_role(current_user, "hr")
+    saved_search = db.get(SavedSearch, saved_search_id)
+    if not saved_search or saved_search.organization_id != current_user.organization_id:
+        raise HTTPException(status_code=404, detail="Kayıtlı arama bulunamadı")
+    db.delete(saved_search)
+    db.commit()
+    return {"deleted": True}
+
+
+@app.get("/shortlists")
+async def list_shortlists(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    require_role(current_user, "hr")
+    if not current_user.organization_id:
+        return {"shortlists": []}
+    shortlists = (
+        db.query(Shortlist)
+        .filter(Shortlist.organization_id == current_user.organization_id)
+        .order_by(Shortlist.created_at.desc())
+        .all()
+    )
+    return {"shortlists": [serialize_shortlist(item) for item in shortlists]}
+
+
+@app.post("/shortlists")
+async def create_shortlist(
+    payload: ShortlistCreateRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    require_role(current_user, "hr")
+    if not current_user.organization_id:
+        raise HTTPException(status_code=400, detail="Aday kaydetmek için şirket bağlantısı gerekli")
+    existing = (
+        db.query(Shortlist)
+        .filter(
+            Shortlist.organization_id == current_user.organization_id,
+            Shortlist.neo4j_candidate_id == payload.neo4j_candidate_id,
+        )
+        .first()
+    )
+    notes = json.dumps(
+        {
+            "candidate_name": payload.candidate_name,
+            "reason": payload.notes,
+        },
+        ensure_ascii=False,
+    )
+    if existing:
+        existing.score = payload.score
+        existing.notes = notes
+        existing.stage = "saved"
+        db.commit()
+        db.refresh(existing)
+        return {"shortlist": serialize_shortlist(existing)}
+
+    shortlist = Shortlist(
+        organization_id=current_user.organization_id,
+        neo4j_candidate_id=payload.neo4j_candidate_id,
+        stage="saved",
+        score=payload.score,
+        notes=notes,
+    )
+    db.add(shortlist)
+    db.commit()
+    db.refresh(shortlist)
+    return {"shortlist": serialize_shortlist(shortlist)}
+
+
+@app.delete("/shortlists/{shortlist_id}")
+async def delete_shortlist(
+    shortlist_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    require_role(current_user, "hr")
+    shortlist = db.get(Shortlist, shortlist_id)
+    if not shortlist or shortlist.organization_id != current_user.organization_id:
+        raise HTTPException(status_code=404, detail="Kaydedilen aday bulunamadı")
+    db.delete(shortlist)
+    db.commit()
+    return {"deleted": True}
 
 @app.post("/upload-cv")
 async def upload_cv(file: UploadFile = File(...)):
@@ -612,6 +843,20 @@ async def candidate_detail(candidate_id: str):
             OPTIONAL MATCH (c)-[:HAS_CERTIFICATION]->(ct:Certification)
             WITH c, skills, experiences, educations, languages, [x IN collect(ct.name) WHERE x IS NOT NULL] AS certifications
 
+            OPTIONAL MATCH (c)-[:HAS_PROJECT]->(p:Project)
+            WITH c, skills, experiences, educations, languages, certifications, collect({
+                name: p.name,
+                description: p.description,
+                role: p.role,
+                start_date: p.start_date,
+                end_date: p.end_date,
+                url: p.url,
+                evidence_text: p.evidence_text,
+                confidence: p.confidence
+            }) AS raw_projects
+            WITH c, skills, experiences, educations, languages, certifications,
+                 [x IN raw_projects WHERE x.name IS NOT NULL] AS projects
+
             RETURN
                 c.id AS id,
                 c.name AS name,
@@ -625,6 +870,7 @@ async def candidate_detail(candidate_id: str):
                 skills,
                 experiences,
                 educations,
+                projects,
                 languages,
                 certifications
         """, id=candidate_id).single()

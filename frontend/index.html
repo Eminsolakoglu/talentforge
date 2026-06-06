@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TalentForge | AI destekli aday eslestirme</title>
+    <title>TalentForge | AI destekli aday eşleştirme</title>
     <meta
       name="description"
-      content="TalentForge, CV'lerden bilgi cikarip Neo4j bilgi grafi ve hibrit graph/vector siralama ile aciklanabilir aday eslestirme yapan HR platformudur."
+      content="TalentForge, CV'lerden bilgi çıkarıp Neo4j bilgi grafı ve hibrit graph/vector sıralama ile açıklanabilir aday eşleştirme yapan HR platformudur."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260605-6" />
+    <link rel="stylesheet" href="./styles.css?v=20260606-9" />
   </head>
   <body>
     <div class="app-shell">
@@ -25,13 +25,13 @@
         </a>
         <nav class="nav-links" aria-label="Ana navigasyon">
           <a href="#how">Sistem</a>
-          <a href="#showcase">Urun</a>
-          <a href="#explain">Eslesme</a>
+          <a href="#showcase">Ürün</a>
+          <a href="#explain">Eşleşme</a>
           <a href="#faq">SSS</a>
         </nav>
         <div class="nav-actions">
-          <button class="ghost-btn" type="button" data-route="login">Giris</button>
-          <button class="primary-btn small" type="button" data-route="login">Baslayin</button>
+          <button class="ghost-btn" type="button" data-route="login">Giriş</button>
+          <button class="primary-btn small" type="button" data-route="login">Başlayın</button>
         </div>
       </header>
 
@@ -40,25 +40,25 @@
           <section id="home" class="hero section-grid">
             <div class="hero-copy" data-reveal>
               <p class="eyebrow">LLM CV extraction / Neo4j graph / Hybrid ranking</p>
-              <h1>IK ekipleri icin aciklanabilir aday zekasi.</h1>
+              <h1>İK ekipleri için açıklanabilir aday zekası.</h1>
               <p class="hero-lead">
-                TalentForge CV'leri yapisal veriye cevirir, aday profilini bilgi grafinda modeller
-                ve pozisyon kriterlerine gore graph + vector sinyalleriyle siralar.
+                TalentForge CV'leri yapısal veriye çevirir, aday profilini bilgi grafında modeller
+                ve pozisyon kriterlerine göre graph + vector sinyalleriyle sıralar.
               </p>
               <div class="hero-actions">
-                <button class="primary-btn" type="button" data-route="login">Baslayin</button>
-                <button class="ghost-btn" type="button" data-demo-upload-trigger>Uye olmadan CV yukle</button>
-                <a class="secondary-link" href="#showcase">Urunu incele</a>
+                <button class="primary-btn" type="button" data-route="login">Başlayın</button>
+                <button class="ghost-btn" type="button" data-demo-upload-trigger>Üye olmadan CV yükle</button>
+                <a class="secondary-link" href="#showcase">Ürünü incele</a>
               </div>
               <div class="demo-upload-card" data-demo-upload>
                 <input id="demo-cv-input" type="file" accept=".pdf,.docx" hidden />
                 <div>
-                  <p class="eyebrow">Canli pipeline demo</p>
-                  <h3>CV'ni bilgi grafigine donustur.</h3>
-                  <p>PDF veya DOCX yukle; LLM extraction, Neo4j graph write ve embedding adimlari gercek API uzerinden calissin.</p>
+                  <p class="eyebrow">Canlı pipeline demo</p>
+                  <h3>CV'ni bilgi grafına dönüştür.</h3>
+                  <p>PDF veya DOCX yükle; LLM extraction, Neo4j graph write ve embedding adımları gerçek API üzerinden çalışsın.</p>
                 </div>
-                <div class="upload-status" data-upload-status>CV secilmeyi bekliyor.</div>
-                <div class="upload-steps" aria-label="Pipeline adimlari">
+                <div class="upload-status" data-upload-status>CV seçilmeyi bekliyor.</div>
+                <div class="upload-steps" aria-label="Pipeline adımları">
                   <span data-upload-step="parse">Parse</span>
                   <span data-upload-step="extract">LLM</span>
                   <span data-upload-step="graph">Graph</span>
@@ -66,7 +66,7 @@
                 </div>
                 <div class="upload-result" data-upload-result></div>
               </div>
-              <div class="hero-stats" aria-label="Urun metrikleri">
+              <div class="hero-stats" aria-label="Ürün metrikleri">
                 <div><strong>50+</strong><span>demo CV</span></div>
                 <div><strong>384</strong><span>vector dim</span></div>
                 <div><strong>RRF</strong><span>hybrid rank</span></div>
@@ -91,7 +91,7 @@
                       <small>Arama</small>
                       <strong>Senior Backend Engineer</strong>
                     </div>
-                    <button>Eslesme raporu</button>
+                    <button>Eşleşme raporu</button>
                   </div>
                   <div class="rank-row hot">
                     <span class="rank">01</span>
@@ -109,7 +109,7 @@
                     </div>
                     <b>84</b>
                   </div>
-                  <div class="mini-graph" aria-label="Bilgi grafi mockup">
+                  <div class="mini-graph" aria-label="Bilgi grafı mockup">
                     <span class="node candidate">Candidate</span>
                     <span class="node skill">Skill</span>
                     <span class="node company">Company</span>
@@ -133,23 +133,23 @@
           <section id="how" class="section">
             <div class="section-heading" data-reveal>
               <p class="eyebrow">How it works</p>
-              <h2>CV'den aciklanabilir eslesmeye uc adim.</h2>
+              <h2>CV'den açıklanabilir eşleşmeye üç adım.</h2>
             </div>
             <div class="steps">
               <article data-reveal>
                 <span>01</span>
-                <h3>Cikar</h3>
-                <p>PDF ve DOCX CV'ler parse edilir, LLM ile yetenek, deneyim, egitim ve kanit metinleri cikarilir.</p>
+                <h3>Çıkar</h3>
+                <p>PDF ve DOCX CV'ler parse edilir, LLM ile yetenek, deneyim, eğitim ve kanıt metinleri çıkarılır.</p>
               </article>
               <article data-reveal>
                 <span>02</span>
                 <h3>Modelle</h3>
-                <p>Aday verisi Neo4j bilgi grafinda skill, sirket, deneyim ve sertifika iliskilerine donusur.</p>
+                <p>Aday verisi Neo4j bilgi grafında skill, şirket, deneyim ve sertifika ilişkilerine dönüşür.</p>
               </article>
               <article data-reveal>
                 <span>03</span>
-                <h3>Eslestir</h3>
-                <p>Graph skoru, vektor benzerligi ve RRF birlesimiyle adaylar aciklamali olarak siralanir.</p>
+                <h3>Eşleştir</h3>
+                <p>Graph skoru, vektör benzerliği ve RRF birleşimiyle adaylar açıklamalı olarak sıralanır.</p>
               </article>
             </div>
           </section>
@@ -157,7 +157,7 @@
           <section id="showcase" class="section showcase">
             <div class="section-heading" data-reveal>
               <p class="eyebrow">Product showcase</p>
-              <h2>Graph, ranking ve CV upload ayni is akisi icinde.</h2>
+              <h2>Graph, ranking ve CV upload aynı iş akışı içinde.</h2>
             </div>
             <div class="device-grid">
               <article class="device-card" data-reveal>
@@ -168,8 +168,8 @@
                   <span class="graph-node g-cert">AWS</span>
                   <i></i><i></i><i></i>
                 </div>
-                <h3>Bilgi grafi gorunumu</h3>
-                <p>Aday profili skill ve deneyim iliskileriyle okunur hale gelir.</p>
+                <h3>Bilgi grafı görünümü</h3>
+                <p>Aday profili skill ve deneyim ilişkileriyle okunur hale gelir.</p>
               </article>
               <article class="device-card" data-reveal>
                 <div class="device-screen ranking-screen">
@@ -177,20 +177,20 @@
                   <div><b>84</b><span>Mert Kaya</span><small>vector boost</small></div>
                   <div><b>78</b><span>Deniz Koc</span><small>lokasyon uyumu</small></div>
                 </div>
-                <h3>Aday siralama</h3>
-                <p>IK sorgusu kontrollu QuerySpec'e cevrilir ve adaylar skorlu listelenir.</p>
+                <h3>Aday sıralama</h3>
+                <p>İK sorgusu kontrollü QuerySpec'e çevrilir ve adaylar skorlu listelenir.</p>
               </article>
               <article class="device-card" data-reveal>
                 <div class="device-screen upload-screen">
                   <div class="upload-box">
-                    <strong>CV yukle</strong>
+                    <strong>CV yükle</strong>
                     <span>PDF / DOCX</span>
                   </div>
                   <p>Extraction complete</p>
                   <div class="progress"><span></span></div>
                 </div>
                 <h3>CV isleme</h3>
-                <p>Dosyalar R2'de saklanir, yapisal ciktilar graph katmanina yazilir.</p>
+                <p>Dosyalar R2'de saklanır, yapısal çıktılar graph katmanına yazılır.</p>
               </article>
             </div>
           </section>
@@ -198,9 +198,9 @@
           <section id="explain" class="section explain">
             <div class="explain-copy" data-reveal>
               <p class="eyebrow">Explainable matching</p>
-              <h2>Sadece skor degil, neden o skor?</h2>
+              <h2>Sadece skor değil, neden o skor?</h2>
               <p>
-                Her aday icin zorunlu yetenek, kidem, deneyim, lokasyon ve semantik benzerlik
+                Her aday için zorunlu yetenek, kidem, deneyim, lokasyon ve semantik benzerlik
                 kirilimlari ayrica gosterilir. Must-have gate ve fuzzy skill matching aday
                 kalitesini daha tutarli hale getirir.
               </p>
@@ -211,7 +211,7 @@
               <ul>
                 <li><b>Zorunlu skill</b><span>Python, FastAPI, AWS</span></li>
                 <li><b>Vektor sinyali</b><span>Backend fintech deneyimi</span></li>
-                <li><b>Graph kaniti</b><span>Experience -> Company -> Industry</span></li>
+                <li><b>Graph kanıti</b><span>Experience -> Company -> Industry</span></li>
                 <li><b>Eksik sinyal</b><span>CKA sertifikasi yok</span></li>
               </ul>
             </div>
@@ -225,68 +225,68 @@
             <div class="faq-list" data-reveal>
               <button class="faq-item" type="button">
                 <span>PostgreSQL neden gerekli?</span>
-                <p>Kullanici, rol, organizasyon, ilan ve kayitli arama gibi urun verileri icin.</p>
+                <p>Kullanıcı, rol, organizasyon, ilan ve kayıtlı arama gibi ürün verileri için.</p>
               </button>
               <button class="faq-item" type="button">
                 <span>Neo4j nerede kullaniliyor?</span>
-                <p>Aday bilgi grafi, iliski sorgulari, vector index ve explainable matching katmaninda.</p>
+                <p>Aday bilgi grafı, ilişki sorgulari, vector index ve explainable matching katmaninda.</p>
               </button>
               <button class="faq-item" type="button">
                 <span>Aday paneli ne yapacak?</span>
-                <p>CV yukleme, profil tamamlama, basvuru durumu ve eslesme geri bildirimi icin.</p>
+                <p>CV yükleme, profil tamamlama, başvuru durumu ve eşleşme geri bildirimi için.</p>
               </button>
             </div>
           </section>
 
           <section class="cta-band" data-reveal>
             <h2>Bitirme projesinden production-ready HR platformuna.</h2>
-            <button class="primary-btn inverse" type="button" data-route="login">Baslayin</button>
+            <button class="primary-btn inverse" type="button" data-route="login">Başlayın</button>
           </section>
         </section>
 
-        <section id="auth-view" class="view auth-layout" aria-label="TalentForge giris">
+        <section id="auth-view" class="view auth-layout" aria-label="TalentForge giriş">
           <div class="auth-art">
-            <button class="back-link" type="button" data-route="landing">Ana sayfaya don</button>
-            <h1>Rolune gore TalentForge deneyimini ac.</h1>
-            <p>IK ekipleri aday havuzunu arar, adaylar CV ve profil bilgilerini yonetir.</p>
-            <div class="role-toggle" role="group" aria-label="Rol secimi">
-              <button class="role-option active" type="button" data-role="hr">IK olarak gir</button>
+            <button class="back-link" type="button" data-route="landing">Ana sayfaya dön</button>
+            <h1>Rolüne göre TalentForge deneyimini aç.</h1>
+            <p>İK ekipleri aday havuzunu arar, adaylar CV ve profil bilgilerini yönetir.</p>
+            <div class="role-toggle" role="group" aria-label="Rol seçimi">
+              <button class="role-option active" type="button" data-role="hr">İK olarak gir</button>
               <button class="role-option" type="button" data-role="candidate">Aday olarak gir</button>
             </div>
           </div>
           <div class="auth-card">
             <div class="auth-tabs">
-              <button class="active" type="button" data-auth-tab="login">Giris</button>
-              <button type="button" data-auth-tab="register">Kayit ol</button>
-              <button type="button" data-auth-tab="forgot">Sifremi unuttum</button>
+              <button class="active" type="button" data-auth-tab="login">Giriş</button>
+              <button type="button" data-auth-tab="register">Kayıt ol</button>
+              <button type="button" data-auth-tab="forgot">Şifremi unuttum</button>
             </div>
 
             <form class="auth-form active" data-auth-panel="login">
               <label>E-posta<input type="email" placeholder="ik@firma.com" required /></label>
-              <label>Sifre<input type="password" placeholder="••••••••" required /></label>
-              <button class="primary-btn full" type="submit">Giris yap</button>
+              <label>Şifre<input type="password" placeholder="••••••••" required /></label>
+              <button class="primary-btn full" type="submit">Giriş yap</button>
             </form>
 
             <form class="auth-form" data-auth-panel="register">
-              <label>Ad Soyad<input type="text" placeholder="Gizem Ozdemir" required /></label>
+              <label>Ad Soyad<input type="text" placeholder="Gizem Özdemir" required /></label>
               <div class="role-fields active" data-register-role="hr">
-                <label>Sirket adi<input type="text" placeholder="TalentForge Labs" required /></label>
-                <label>Sirket e-postasi<input type="email" placeholder="gizem@talentforge.ai" required /></label>
+                <label>Şirket adı<input type="text" placeholder="TalentForge Labs" required /></label>
+                <label>Şirket e-postası<input type="email" placeholder="gizem@talentforge.ai" required /></label>
                 <label>Pozisyon<input type="text" placeholder="Talent Acquisition Specialist" /></label>
               </div>
               <div class="role-fields" data-register-role="candidate">
                 <label>E-posta<input type="email" placeholder="aday@mail.com" required /></label>
-                <label>Okul<input type="text" placeholder="Marmara Universitesi" /></label>
+                <label>Okul<input type="text" placeholder="Marmara Üniversitesi" /></label>
                 <label>Meslek / hedef rol<input type="text" placeholder="Backend Developer" /></label>
-                <label>Tecrube yili<input type="number" min="0" max="40" placeholder="2" /></label>
+                <label>Tecrübe yılı<input type="number" min="0" max="40" placeholder="2" /></label>
               </div>
-              <label>Sifre<input type="password" placeholder="En az 8 karakter" required /></label>
-              <button class="primary-btn full" type="submit">Hesap olustur</button>
+              <label>Şifre<input type="password" placeholder="En az 8 karakter" required /></label>
+              <button class="primary-btn full" type="submit">Hesap oluştur</button>
             </form>
 
             <form class="auth-form" data-auth-panel="forgot">
-              <label>E-posta<input type="email" placeholder="hesap e-postasi" required /></label>
-              <button class="primary-btn full" type="submit">Sifirlama baglantisi gonder</button>
+              <label>E-posta<input type="email" placeholder="hesap e-postası" required /></label>
+              <button class="primary-btn full" type="submit">Sıfırlama bağlantısı gönder</button>
             </form>
             <p class="auth-message" aria-live="polite"></p>
           </div>
@@ -294,29 +294,29 @@
 
         <section id="dashboard-view" class="view dashboard-view" aria-label="TalentForge dashboard">
           <aside class="dash-nav">
-            <a class="brand" href="#dashboard" data-route="dashboard">
+            <a class="brand" href="#home" data-route="landing">
               <img class="brand-logo" src="./tf_logo.png" alt="" width="38" height="38" />
               <span>TalentForge</span>
             </a>
             <div class="dash-menu" data-menu-role="hr">
-              <button class="dash-link active" type="button" data-dash-tab="overview">Genel bakis</button>
+              <button class="dash-link active" type="button" data-dash-tab="overview">Anasayfa</button>
               <button class="dash-link" type="button" data-dash-tab="search">Aday arama</button>
-              <button class="dash-link" type="button" data-dash-tab="jobs">Ilanlar</button>
-              <button class="dash-link" type="button" data-dash-tab="shortlist">Shortlist</button>
+              <button class="dash-link" type="button" data-dash-tab="jobs">İlanlar</button>
+              <button class="dash-link" type="button" data-dash-tab="shortlist">Kaydedilen adaylar</button>
             </div>
             <div class="dash-menu" data-menu-role="candidate">
-              <button class="dash-link active" type="button" data-dash-tab="overview">Genel bakis</button>
+              <button class="dash-link active" type="button" data-dash-tab="overview">Anasayfa</button>
               <button class="dash-link" type="button" data-dash-tab="profile">Profilim</button>
-              <button class="dash-link" type="button" data-dash-tab="matches">Eslesmeler</button>
-              <button class="dash-link" type="button" data-dash-tab="applications">Basvurular</button>
+              <button class="dash-link" type="button" data-dash-tab="matches">Eşleşmeler</button>
+              <button class="dash-link" type="button" data-dash-tab="applications">Başvurular</button>
             </div>
-            <button class="ghost-btn" type="button" data-route="landing">Cikis</button>
+            <button class="ghost-btn" type="button" data-route="landing">Çıkış</button>
           </aside>
           <div class="dash-main">
             <div class="dash-top">
               <div>
-                <p class="eyebrow" id="dashboard-role-label">IK dashboard</p>
-                <h1 id="dashboard-title">Aday havuzunu yonet.</h1>
+                <p class="eyebrow" id="dashboard-role-label">İK anasayfa</p>
+                <h1 id="dashboard-title"></h1>
               </div>
               <button class="primary-btn small" type="button" data-top-action="search">Yeni arama</button>
             </div>
@@ -325,29 +325,28 @@
               <div class="dashboard-panel active" data-panel="overview">
                 <div class="company-card">
                   <div>
-                    <p class="eyebrow">Sirket profili</p>
+                    <p class="eyebrow">Şirket profili</p>
                     <h2>TalentForge Labs</h2>
-                    <p>talentforge.ai domaini dogrulandi. 4 IK kullanicisi, 12 aktif ilan.</p>
+                    <p>12 aktif ilan.</p>
                   </div>
-                  <span class="status-pill">Verified company mail</span>
                 </div>
                 <div class="metric-grid">
-                  <article><span>Aktif aday</span><strong>128</strong></article>
-                  <article><span>Kayitli arama</span><strong>14</strong></article>
-                  <article><span>Shortlist</span><strong>32</strong></article>
-                  <article><span>Ortalama skor</span><strong>81</strong></article>
                 </div>
-                <div class="dash-panels">
+                <div class="dash-panels" id="hr-overview-panels">
                   <section class="dash-panel">
-                    <h2>Son eslesmeler</h2>
-                    <div class="rank-row hot"><span class="rank">01</span><div><strong>Senior Backend</strong><p>Elif Yilmaz / 92 / FastAPI + AWS</p></div><b>RRF</b></div>
-                    <div class="rank-row"><span class="rank">02</span><div><strong>Data Analyst</strong><p>Zeynep Demir / 88 / SQL + Power BI</p></div><b>KG</b></div>
-                    <div class="rank-row"><span class="rank">03</span><div><strong>DevOps</strong><p>Ege Gunes / 84 / Kubernetes</p></div><b>Vector</b></div>
+                    <h2>Son arama sonuçları</h2>
+                    <div id="recent-match-list" class="list-stack">
+                      <div class="empty-state compact">
+                        <h3>Henüz arama yapılmadı</h3>
+                        <p>Aday arama çalıştırdığında en son sonuçlar burada görünecek.</p>
+                      </div>
+                    </div>
                   </section>
                   <section class="dash-panel">
-                    <h2>Takim notlari</h2>
-                    <p>Bugun 6 CV islendi, 2 aday shortlist'e eklendi.</p>
-                    <p>Backend ilaninda CKA sertifikasi nice-to-have olarak guncellendi.</p>
+                    <h2>Durum özeti</h2>
+                    <div id="hr-status-summary" class="list-stack">
+                      <p>Veriler yükleniyor...</p>
+                    </div>
                   </section>
                 </div>
               </div>
@@ -355,8 +354,8 @@
               <div class="dashboard-panel" data-panel="search">
                 <div class="dash-panels wide-left">
                   <section class="dash-panel">
-                    <h2>Dogal dil aday arama</h2>
-                    <div class="query-box">5 yil Python ve AWS deneyimi olan, Istanbul'da yasayan senior backend muhendisi ara.</div>
+                    <h2>Doğal dil aday arama</h2>
+                    <div class="query-box">5 yıl Python ve AWS deneyimi olan, İstanbul'da yaşayan senior backend mühendisi ara.</div>
                     <div class="query-spec">
                       <span>must: Python, AWS</span>
                       <span>seniority: senior</span>
@@ -365,16 +364,19 @@
                     </div>
                   </section>
                   <section class="dash-panel">
-                    <h2>Kayitli aramalar</h2>
-                    <p>Senior Python Istanbul</p>
-                    <p>Mobile Flutter Remote</p>
-                    <p>Cybersecurity ISO 27001</p>
+                    <h2>Kayıtlı aramalar</h2>
+                    <div id="saved-search-list" class="saved-list">
+                      <div class="empty-state compact">
+                        <h3>Kayıtlı arama yok</h3>
+                        <p>Arama yaptıktan sonra kaydedebilirsin.</p>
+                      </div>
+                    </div>
                   </section>
                 </div>
                 <div class="candidate-table">
-                  <div class="table-row head"><span>Aday</span><span>Skor</span><span>Aciklama</span><span>Aksiyon</span></div>
-                  <div class="table-row"><span>Elif Yilmaz</span><span>92</span><span>5/5 must-have, vector boost</span><button>Shortlist</button></div>
-                  <div class="table-row"><span>Mert Kaya</span><span>84</span><span>Microservices fuzzy match</span><button>Incele</button></div>
+                  <div class="table-row head"><span>Aday</span><span>Skor</span><span>Açıklama</span><span>Aksiyon</span></div>
+                  <div class="table-row"><span>Elif Yilmaz</span><span>92</span><span>5/5 must-have, vector boost</span><button>Kaydet</button></div>
+                  <div class="table-row"><span>Mert Kaya</span><span>84</span><span>Microservices fuzzy match</span><button>İncele</button></div>
                   <div class="table-row"><span>Deniz Koc</span><span>78</span><span>Lokasyon uyumlu, sertifika eksik</span><button>Not al</button></div>
                 </div>
               </div>
@@ -391,7 +393,7 @@
                     </div>
                   </section>
                   <section class="dash-panel">
-                    <h2>Ilan durumu</h2>
+                    <h2>İlan durumu</h2>
                     <p>Senior Backend Engineer - 38 aday</p>
                     <p>Data Analyst - 24 aday</p>
                     <p>Mobile Developer - 17 aday</p>
@@ -401,10 +403,10 @@
 
               <div class="dashboard-panel" data-panel="shortlist">
                 <div class="pipeline">
-                  <article><h3>Yeni</h3><p>Elif Yilmaz</p><p>Can Sahin</p></article>
-                  <article><h3>IK gorusmesi</h3><p>Mert Kaya</p><p>Naz Kilic</p></article>
-                  <article><h3>Teknik</h3><p>Ege Gunes</p></article>
-                  <article><h3>Teklif</h3><p>Zeynep Demir</p></article>
+                  <article><h3>Kaydedilenler</h3><p>Henüz aday kaydedilmedi.</p></article>
+                  <article><h3>İK görüşmesi</h3><p>Kayıt yok.</p></article>
+                  <article><h3>Teknik</h3><p>Kayıt yok.</p></article>
+                  <article><h3>Teklif</h3><p>Kayıt yok.</p></article>
                 </div>
               </div>
             </div>
@@ -415,20 +417,20 @@
                   <div>
                     <p class="eyebrow">Aday profili</p>
                     <h2>Gizem Ozdemir</h2>
-                    <p>Backend Developer / Marmara Universitesi / 2 yil deneyim</p>
+                    <p>Backend Developer / Marmara Üniversitesi / 2 yıl deneyim</p>
                   </div>
-                  <span class="status-pill">CV islendi</span>
+                  <span class="status-pill">CV işlendi</span>
                 </div>
                 <div class="metric-grid">
                   <article><span>Profil doluluk</span><strong>76%</strong></article>
                   <article><span>Uygun ilan</span><strong>9</strong></article>
-                  <article><span>Basvuru</span><strong>4</strong></article>
+                  <article><span>Başvuru</span><strong>4</strong></article>
                   <article><span>Geri bildirim</span><strong>3</strong></article>
                 </div>
                 <div class="dash-panels">
                   <section class="dash-panel">
                     <h2>Profil sinyalleri</h2>
-                    <p>Python, FastAPI ve AWS becerileri guclu.</p>
+                    <p>Python, FastAPI ve AWS becerileri güçlü.</p>
                     <p>Lokasyon tercihi ve dil seviyesi tamamlanmali.</p>
                     <div class="progress"><span></span></div>
                   </section>
@@ -445,11 +447,11 @@
                   <section class="dash-panel">
                     <h2>Temel bilgiler</h2>
                     <div class="form-preview">
-                      <span>Okul: Marmara Universitesi</span>
-                      <span>Bolum: Bilgisayar Muhendisligi</span>
+                      <span>Okul: Marmara Üniversitesi</span>
+                      <span>Bölüm: Bilgisayar Mühendisliği</span>
                       <span>Meslek: Backend Developer</span>
-                      <span>Tecrube: 2 yil</span>
-                      <span>Lokasyon: Istanbul / Remote acik</span>
+                      <span>Tecrübe: 2 yıl</span>
+                      <span>Lokasyon: İstanbul / Remote açık</span>
                     </div>
                   </section>
                   <section class="dash-panel">
@@ -464,17 +466,17 @@
               <div class="dashboard-panel" data-panel="matches">
                 <div class="candidate-table">
                   <div class="table-row head"><span>Pozisyon</span><span>Skor</span><span>Neden uydu?</span><span>Durum</span></div>
-                  <div class="table-row"><span>Backend Engineer</span><span>92</span><span>Python + FastAPI + Istanbul</span><button>Basvur</button></div>
+                  <div class="table-row"><span>Backend Engineer</span><span>92</span><span>Python + FastAPI + İstanbul</span><button>Başvur</button></div>
                   <div class="table-row"><span>Platform Engineer</span><span>84</span><span>Docker + AWS sinyali</span><button>Kaydet</button></div>
-                  <div class="table-row"><span>Data Engineer</span><span>73</span><span>SQL guclu, Spark eksik</span><button>Incele</button></div>
+                  <div class="table-row"><span>Data Engineer</span><span>73</span><span>SQL güçlü, Spark eksik</span><button>İncele</button></div>
                 </div>
               </div>
 
               <div class="dashboard-panel" data-panel="applications">
                 <div class="timeline">
-                  <article><span>Bugun</span><h3>Backend Engineer</h3><p>CV inceleniyor</p></article>
-                  <article><span>Dun</span><h3>Platform Engineer</h3><p>IK gorusmesi planlandi</p></article>
-                  <article><span>20 Mayis</span><h3>Data Analyst</h3><p>Geri bildirim alindi</p></article>
+                  <article><span>Bugün</span><h3>Backend Engineer</h3><p>CV inceleniyor</p></article>
+                  <article><span>Dün</span><h3>Platform Engineer</h3><p>İK görüşmesi planlandı</p></article>
+                  <article><span>20 Mayıs</span><h3>Data Analyst</h3><p>Geri bildirim alındı</p></article>
                 </div>
               </div>
             </div>
@@ -488,6 +490,7 @@
       </footer>
     </div>
 
-    <script src="./app.js?v=20260605-6"></script>
+    <script src="./app.js?v=20260606-9"></script>
   </body>
 </html>
+

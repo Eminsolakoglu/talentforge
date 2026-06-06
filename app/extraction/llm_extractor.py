@@ -19,6 +19,8 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
+LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "12000"))
+
 
 def _build_client():
     """
@@ -140,7 +142,7 @@ class LLMExtractor:
                     {"role": "user", "content": user_prompt},
                 ],
                 temperature=0,
-                max_tokens=8192,
+                max_tokens=LLM_MAX_TOKENS,
                 max_retries=2,
             )
 

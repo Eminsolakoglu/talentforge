@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
 from datetime import date
 
@@ -33,6 +33,18 @@ class EducationRecord(BaseModel):
     end_year: Optional[int] = None
     gpa: Optional[float] = None
 
+
+class ProjectRecord(BaseModel):
+    name: str
+    description: Optional[str] = None
+    role: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    url: Optional[str] = None
+    skills_used: List[str] = Field(default_factory=list)
+    evidence_text: str = ""
+    confidence: float = Field(default=0.8, ge=0.0, le=1.0)
+
 class CVExtraction(BaseModel):
     candidate_name: Optional[str] = None
     email: Optional[str] = None
@@ -42,5 +54,19 @@ class CVExtraction(BaseModel):
     experiences: List[ExperienceRecord] = Field(default_factory=list)
     skills: List[SkillRecord] = Field(default_factory=list)
     educations: List[EducationRecord] = Field(default_factory=list)
+    projects: List[ProjectRecord] = Field(default_factory=list)
     languages: List[str] = Field(default_factory=list)
     certifications: List[str] = Field(default_factory=list)
+
+    @field_validator(
+        "experiences",
+        "skills",
+        "educations",
+        "projects",
+        "languages",
+        "certifications",
+        mode="before",
+    )
+    @classmethod
+    def _none_to_empty_list(cls, value):
+        return [] if value is None else value

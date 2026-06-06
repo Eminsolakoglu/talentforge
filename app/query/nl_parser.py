@@ -42,14 +42,32 @@ TITLE_PATTERNS = [
     (r"\bbusiness analyst\b|\biş analist", "Business Analyst"),
 ]
 
+INSTITUTION_PATTERNS = [
+    (r"\bodt[üu]\b|\borta dogu teknik\b|\bmiddle east technical\b", "ODTÜ"),
+    (r"\bbo[gğ]azi[cç]i\b|\bbogazici\b", "Boğaziçi Üniversitesi"),
+    (r"\bit[üu]\b|\bistanbul teknik\b", "İstanbul Teknik Üniversitesi"),
+    (r"\bmarmara\b", "Marmara Üniversitesi"),
+    (r"\by[ıi]ld[ıi]z teknik\b|\bytu\b", "Yıldız Teknik Üniversitesi"),
+    (r"\bhacettepe\b", "Hacettepe Üniversitesi"),
+    (r"\bistanbul [üu]niversitesi\b", "İstanbul Üniversitesi"),
+    (r"\bankara [üu]niversitesi\b", "Ankara Üniversitesi"),
+    (r"\bege [üu]niversitesi\b", "Ege Üniversitesi"),
+]
+
 
 def _apply_deterministic_fallbacks(query_spec: QuerySpec, nl_text: str) -> QuerySpec:
+    text = nl_text.lower()
     if not query_spec.title:
-        text = nl_text.lower()
         for pattern, title in TITLE_PATTERNS:
             if re.search(pattern, text):
                 query_spec.title = title
                 break
+    found_institutions = list(query_spec.education_institutions or [])
+    for pattern, institution in INSTITUTION_PATTERNS:
+        if re.search(pattern, text) and institution not in found_institutions:
+            found_institutions.append(institution)
+    if found_institutions:
+        query_spec.education_institutions = found_institutions
     return query_spec
 
 NL_SYSTEM_PROMPT = """\
@@ -63,6 +81,7 @@ KURALLAR:
 - min_experience_years: Sayısal değer, "5+ yıl" → 5, yoksa 0
 - locations: Şehir isimleri, "uzaktan/remote" → ["Remote"]
 - education_level: bsc | msc | phd (yoksa null)
+- education_institutions: Okul/üniversite ismi isteniyorsa listele. Örn: "ODTÜ mezunu" → ["ODTÜ"]
 - languages: Dil gereksinimleri varsa ekle
 - free_text: Yapısal alanlara sığmayan geri kalan metin
 
@@ -84,6 +103,7 @@ Docker ve Kubernetes bilmesi tercih edilir. Yüksek lisans tercihen."
   "min_experience_years": 5,
   "locations": ["Istanbul"],
   "education_level": "msc",
+  "education_institutions": [],
   "languages": [],
   "must_have_certifications": [],
   "preferred_industries": [],
@@ -101,6 +121,7 @@ Agile metodoloji şart. İngilizce B2 seviye gerekli. Remote çalışma mümkün
   "min_experience_years": 0,
   "locations": ["Remote"],
   "education_level": null,
+  "education_institutions": [],
   "languages": [{"code": "English", "min_level": "B2"}],
   "must_have_certifications": [],
   "preferred_industries": ["Fintech"],

@@ -124,6 +124,12 @@ Sadece açıkça yazılan bilgiyi değil, metinden makul şekilde
 FEW_SHOT_EXAMPLE = """\
 ## ÖRNEK — Dolaylı çıkarım dahil
 
+Project extraction ek kurallari:
+- Proje/portfolio/case study/academic project/freelance project bolumleri varsa `projects` listesine ayri cikar.
+- Sirket deneyimi altindaki normal gorevleri project olarak kopyalama.
+- Project alanlari: name, description, role, start_date, end_date, url, skills_used, evidence_text, confidence.
+- Project skills_used degerlerini normalize et; evidence zayifsa veya confidence < 0.60 ise projeyi ekleme.
+
 ### CV Metni:
 \"\"\"
 Elif Kara

@@ -27,5 +27,6 @@ class QuerySpec(BaseModel):
     locations: List[str] = Field(default_factory=list)
     languages: List[LanguageReq] = Field(default_factory=list)
     education_level: Optional[Degree] = None
+    education_institutions: List[str] = Field(default_factory=list)
     must_have_certifications: List[str] = Field(default_factory=list)
     free_text: Optional[str] = None

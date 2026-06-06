@@ -106,6 +106,17 @@ def make_triples(record: dict[str, Any]) -> set[Triple]:
         if normalize(cert):
             triples.add(Triple(candidate, "HAS_CERTIFICATION", normalize(cert)))
 
+    for project in record.get("projects", []) or []:
+        if not isinstance(project, dict):
+            continue
+        project_name = normalize(project.get("name"))
+        if not project_name:
+            continue
+        triples.add(Triple(candidate, "HAS_PROJECT", project_name))
+        for skill in project.get("skills_used", []) or []:
+            if normalize(skill):
+                triples.add(Triple(project_name, "PROJECT_USED_SKILL", normalize(skill)))
+
     return triples
 
 
@@ -141,10 +152,11 @@ def evaluate_triples(
     metadata_fields = metadata_fields or [
         "difficulty",
         "file_format",
-        "language",
+        "cv_language",
         "template_type",
         "role_family",
         "seniority",
+        "title_group",
     ]
 
     total_pred: set[Triple] = set()

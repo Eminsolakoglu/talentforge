@@ -40,6 +40,8 @@ from evaluation.triple_evaluator import make_triples
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
+LLM_MAX_TOKENS = int(os.getenv("EVAL_LLM_MAX_TOKENS", "8192"))
+
 # ── Model → endpoint yönlendirme ─────────────────────────────────────
 
 def _get_client(model: str):
@@ -98,7 +100,7 @@ def call_llm(system_prompt: str, user_prompt: str, model: str) -> Optional[Dict]
                 {"role": "user", "content": user_prompt},
             ],
             temperature=0,
-            max_tokens=4096,
+            max_tokens=LLM_MAX_TOKENS,
         )
         raw_text = response.choices[0].message.content or ""
         result = _parse_json_response(raw_text)
@@ -111,17 +113,37 @@ def call_llm(system_prompt: str, user_prompt: str, model: str) -> Optional[Dict]
 
 
 def _parse_json_response(text: str) -> Optional[Dict]:
-    text = re.sub(r"```(?:json)?", "", text).strip().strip("`").strip()
-    try:
-        return json.loads(text)
-    except Exception:
-        pass
-    match = re.search(r"\{.*\}", text, re.DOTALL)
-    if match:
+    text = text.strip()
+    fenced = re.search(r"```(?:json)?\s*(.*?)\s*```", text, re.DOTALL | re.IGNORECASE)
+    candidates = []
+    if fenced:
+        candidates.append(fenced.group(1).strip())
+    candidates.append(re.sub(r"```(?:json)?", "", text, flags=re.IGNORECASE).strip().strip("`").strip())
+
+    decoder = json.JSONDecoder()
+    for candidate in candidates:
         try:
-            return json.loads(match.group())
+            return json.loads(candidate)
         except Exception:
             pass
+        brace_index = candidate.find("{")
+        if brace_index >= 0:
+            try:
+                parsed, _ = decoder.raw_decode(candidate[brace_index:])
+                if isinstance(parsed, dict):
+                    return parsed
+            except Exception:
+                pass
+
+    # Last resort: trim trailing prose after the final closing brace.
+    for candidate in candidates:
+        start = candidate.find("{")
+        end = candidate.rfind("}")
+        if start >= 0 and end > start:
+            try:
+                return json.loads(candidate[start:end + 1])
+            except Exception:
+                pass
     return None
 
 
