@@ -98,6 +98,49 @@ class CVProcessingPipeline:
             logger.error(f"❌ Pipeline error: {e}")
             return None
 
+    def extract_only(self, file_path: str | Path) -> Optional[dict]:
+        """CV'yi parse + LLM + RAG ile çıkarır, Neo4j/R2 kaydı yapmaz."""
+        file_path = Path(file_path)
+        try:
+            logger.info(f"Preview extraction started for: {file_path.name}")
+            file_hash = self._compute_hash(file_path)
+            parse_result = self.parser.parse(file_path)
+            raw_text = parse_result.get("raw_text", "")
+            if not raw_text or len(raw_text) < 50:
+                logger.warning("CV metni çok kısa veya boş")
+                return None
+
+            extraction = self.extractor.extract(raw_text)
+            if not extraction:
+                logger.error("LLM extraction failed")
+                return None
+
+            validation = self.rag_validator.validate(extraction, raw_text)
+            extraction = validation.cleaned_extraction
+            result = extraction.model_dump()
+            result["file_hash"] = file_hash
+            result["preview_only"] = True
+            return result
+        except Exception as e:
+            logger.error(f"Preview extraction error: {e}")
+            return None
+
+    def commit_extraction(self, extraction, file_hash: str | None = None) -> Optional[str]:
+        """Önizlenen extraction sonucunu Neo4j'ye yazar ve embedding üretir."""
+        try:
+            if self._is_duplicate(file_hash):
+                logger.info("Bu CV zaten yüklü, kayıt atlandı")
+                return None
+            cv_id = self.kg_loader.save_candidate(extraction, file_hash=file_hash)
+            er_stats = self.entity_resolver.resolve_all()
+            if sum(er_stats.values()) > 0:
+                logger.info(f"Entity Resolution: {er_stats}")
+            self.embedding_service.embed_candidate(cv_id)
+            return cv_id
+        except Exception as e:
+            logger.error(f"Commit extraction error: {e}")
+            return None
+
     def _compute_hash(self, file_path: Path) -> str:
         """Dosya içeriğinden SHA256 hash üretir"""
         h = hashlib.sha256()

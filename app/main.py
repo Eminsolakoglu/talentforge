@@ -12,23 +12,28 @@ import os
 import hashlib
 import mimetypes
 import json
+import uuid
 from typing import List, Dict
 from jose import JWTError, jwt
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
-from app.core.storage import upload_cv as r2_upload, download_cv as r2_download
+from app.core.storage import upload_cv as r2_upload, download_cv as r2_download, delete_cv as r2_delete
 
 from app.core.config import get_settings
 from app.core.database import get_neo4j_driver, close_neo4j_driver
-from app.core.postgres import get_db
+from app.core.postgres import get_db, init_db
 from app.core.security import ALGORITHM, create_access_token, hash_password, verify_password
 from app.extraction.pipeline import CVProcessingPipeline
+from app.schemas.cv_extraction import CVExtraction
 from app.models.postgres import (
+    CandidateCVProfile,
     CandidateProfile,
+    Conversation,
     HRProfile,
     JobApplication,
     JobPost,
+    Message,
     Organization,
     SavedSearch,
     Shortlist,
@@ -52,6 +57,7 @@ logger = logging.getLogger(__name__)
 
 pipeline: CVProcessingPipeline | None = None
 matcher: CandidateMatcher | None = None
+STAGED_CVS: dict[str, dict] = {}
 security = HTTPBearer()
 
 
@@ -71,6 +77,11 @@ def get_matcher() -> CandidateMatcher:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("🚀 TalentForge başlatılıyor...")
+    try:
+        init_db()
+        logger.info("PostgreSQL tablolari hazir")
+    except Exception as e:
+        logger.warning(f"PostgreSQL tablolari hazirlanamadi: {e}")
     try:
         get_neo4j_driver()
         logger.info("Neo4j baglantisi hazir")
@@ -162,6 +173,106 @@ def serialize_job(job: JobPost, application: JobApplication | None = None) -> di
     }
 
 
+def query_spec_from_job(job: JobPost) -> QuerySpec:
+    locations = [job.location] if job.location else []
+    seniority = job.seniority if job.seniority in {"junior", "mid", "senior", "lead"} else None
+    return QuerySpec(
+        title=job.title,
+        seniority=seniority,
+        must_have_skills=job.must_have_skills or [],
+        nice_to_have_skills=job.nice_to_have_skills or [],
+        min_experience_years=job.min_experience_years,
+        preferred_industries=[],
+        locations=locations,
+        languages=[],
+        education_level=None,
+        education_institutions=[],
+        must_have_certifications=[],
+        free_text=job.description,
+    )
+
+
+def candidate_neo4j_ids(candidate: CandidateProfile | None) -> list[str]:
+    if not candidate:
+        return []
+    ids = [profile.neo4j_candidate_id for profile in candidate.cv_profiles if profile.neo4j_candidate_id]
+    if candidate.neo4j_candidate_id:
+        ids.append(candidate.neo4j_candidate_id)
+    return list(dict.fromkeys(ids))
+
+
+def resolve_candidate_neo4j_ids(candidate: CandidateProfile | None, db: Session) -> list[str]:
+    """Return Neo4j candidate ids for a member, repairing old/missing PG links when possible."""
+    ids = candidate_neo4j_ids(candidate)
+    if ids or not candidate or not candidate.user:
+        return ids
+
+    email = (candidate.user.email or "").strip().lower()
+    full_name = (candidate.user.full_name or "").strip().lower()
+    if not email and not full_name:
+        return []
+
+    try:
+        with get_neo4j_driver().session() as session:
+            records = session.run(
+                """
+                MATCH (c:Candidate)
+                WHERE ($email <> '' AND toLower(coalesce(c.email, '')) = $email)
+                   OR ($name <> '' AND toLower(coalesce(c.name, '')) = $name)
+                RETURN c.id AS id,
+                       c.cv_original_name AS file_name,
+                       c.summary AS summary
+                LIMIT 8
+                """,
+                email=email,
+                name=full_name,
+            )
+            resolved = [dict(record) for record in records if record["id"]]
+    except Exception as e:
+        logger.warning(f"Aday Neo4j id cozumleme basarisiz: {e}")
+        return []
+
+    for item in resolved:
+        cv_id = item["id"]
+        if cv_id not in ids:
+            ids.append(cv_id)
+        exists = (
+            db.query(CandidateCVProfile)
+            .filter(CandidateCVProfile.neo4j_candidate_id == cv_id)
+            .first()
+        )
+        if not exists:
+            db.add(
+                CandidateCVProfile(
+                    candidate_profile_id=candidate.id,
+                    neo4j_candidate_id=cv_id,
+                    file_name=item.get("file_name"),
+                    title=candidate.profession,
+                    summary=item.get("summary"),
+                )
+            )
+
+    existing_owner = None
+    if ids:
+        existing_owner = (
+            db.query(CandidateProfile)
+            .filter(
+                CandidateProfile.neo4j_candidate_id == ids[0],
+                CandidateProfile.id != candidate.id,
+            )
+            .first()
+        )
+    if ids and not candidate.neo4j_candidate_id and not existing_owner:
+        candidate.neo4j_candidate_id = ids[0]
+        db.add(candidate)
+    if ids:
+        try:
+            db.commit()
+        except IntegrityError:
+            db.rollback()
+    return list(dict.fromkeys(ids))
+
+
 def serialize_application(application: JobApplication) -> dict:
     candidate = application.candidate
     return {
@@ -228,6 +339,102 @@ def serialize_shortlist(shortlist: Shortlist) -> dict:
         "reasons": [reason] if reason else [],
         "stage": shortlist.stage,
         "created_at": shortlist.created_at.isoformat() if shortlist.created_at else None,
+    }
+
+
+def candidate_membership(db: Session, neo4j_candidate_id: str | None) -> dict:
+    if not neo4j_candidate_id:
+        return {
+            "talentforge_member": False,
+            "candidate_user_id": None,
+            "member_label": "TalentForge uyesi degil",
+        }
+
+    cv_profile = (
+        db.query(CandidateCVProfile)
+        .filter(CandidateCVProfile.neo4j_candidate_id == neo4j_candidate_id)
+        .first()
+    )
+    profile = cv_profile.candidate_profile if cv_profile else None
+    if profile is None:
+        profile = (
+            db.query(CandidateProfile)
+            .filter(CandidateProfile.neo4j_candidate_id == neo4j_candidate_id)
+            .first()
+        )
+
+    if not profile:
+        return {
+            "talentforge_member": False,
+            "candidate_user_id": None,
+            "member_label": "TalentForge uyesi degil",
+        }
+
+    return {
+        "talentforge_member": True,
+        "candidate_user_id": profile.user_id,
+        "candidate_profile_id": profile.id,
+        "member_label": "TalentForge uyesi",
+    }
+
+
+def enrich_candidate_membership(results: list[dict], db: Session) -> list[dict]:
+    enriched = []
+    for result in results:
+        candidate_id = result.get("candidate_id") or result.get("id")
+        enriched.append({**result, **candidate_membership(db, candidate_id)})
+    return enriched
+
+
+def conversation_unread_count(conversation: Conversation, current_user: User, db: Session) -> int:
+    return (
+        db.query(Message)
+        .filter(
+            Message.conversation_id == conversation.id,
+            Message.sender_user_id != current_user.id,
+            Message.read_at.is_(None),
+        )
+        .count()
+    )
+
+
+def serialize_message(message: Message) -> dict:
+    return {
+        "id": message.id,
+        "conversation_id": message.conversation_id,
+        "sender_user_id": message.sender_user_id,
+        "body": message.body,
+        "read_at": message.read_at.isoformat() if message.read_at else None,
+        "created_at": message.created_at.isoformat() if message.created_at else None,
+    }
+
+
+def serialize_conversation(conversation: Conversation, current_user: User, db: Session) -> dict:
+    other_user_id = (
+        conversation.candidate_user_id if current_user.id == conversation.hr_user_id else conversation.hr_user_id
+    )
+    other_user = db.get(User, other_user_id)
+    last_message = (
+        db.query(Message)
+        .filter(Message.conversation_id == conversation.id)
+        .order_by(Message.created_at.desc())
+        .first()
+    )
+    return {
+        "id": conversation.id,
+        "hr_user_id": conversation.hr_user_id,
+        "candidate_user_id": conversation.candidate_user_id,
+        "candidate_neo4j_id": conversation.candidate_neo4j_id,
+        "other_user": {
+            "id": other_user.id,
+            "name": other_user.full_name,
+            "email": other_user.email,
+            "role": other_user.role,
+        } if other_user else None,
+        "last_message": serialize_message(last_message) if last_message else None,
+        "unread_count": conversation_unread_count(conversation, current_user, db),
+        "last_message_at": conversation.last_message_at.isoformat() if conversation.last_message_at else None,
+        "created_at": conversation.created_at.isoformat() if conversation.created_at else None,
     }
 
 
@@ -449,6 +656,57 @@ async def list_jobs(
     return {"jobs": [serialize_job(job, applied_by_job_id.get(job.id)) for job in jobs]}
 
 
+@app.get("/candidate/recommendations")
+async def candidate_recommendations(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    require_role(current_user, "candidate")
+    candidate = current_user.candidate_profile
+    candidate_ids = set(resolve_candidate_neo4j_ids(candidate, db))
+    if not candidate or not candidate_ids:
+        return {"recommendations": []}
+
+    applications = (
+        db.query(JobApplication)
+        .filter(JobApplication.candidate_profile_id == candidate.id)
+        .all()
+    )
+    applied_by_job_id = {application.job_post_id: application for application in applications}
+
+    jobs = (
+        db.query(JobPost)
+        .filter(JobPost.status == "published")
+        .order_by(JobPost.created_at.desc())
+        .all()
+    )
+    recommendations = []
+    matcher = get_matcher()
+    for job in jobs:
+        query_spec = query_spec_from_job(job)
+        try:
+            matches = matcher.search(query_spec, limit=100)
+        except Exception as e:
+            logger.warning(f"Aday ilan onerisi hesaplanamadi ({job.id}): {e}")
+            matches = []
+        candidate_match = next(
+            (match for match in matches if match.get("candidate_id") in candidate_ids),
+            None,
+        )
+        if not candidate_match:
+            continue
+        recommendations.append({
+            "job": serialize_job(job, applied_by_job_id.get(job.id)),
+            "match_score": candidate_match.get("total_score"),
+            "score_breakdown": candidate_match.get("score_breakdown") or {},
+            "reasons": candidate_match.get("reasons") or [],
+            "matched_candidate_id": candidate_match.get("candidate_id"),
+        })
+
+    recommendations.sort(key=lambda item: item.get("match_score") or 0, reverse=True)
+    return {"recommendations": recommendations}
+
+
 @app.post("/jobs")
 async def create_job(
     payload: JobCreateRequest,
@@ -483,11 +741,29 @@ async def job_detail(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    job = db.get(JobPost, job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Ilan bulunamadi")
+    if current_user.role == "hr" and job.organization_id != current_user.organization_id:
+        raise HTTPException(status_code=404, detail="Ilan bulunamadi")
+    if current_user.role == "candidate" and job.status != "published":
+        raise HTTPException(status_code=404, detail="Ilan bulunamadi")
+    return {"job": serialize_job(job)}
+
+
+@app.delete("/jobs/{job_id}")
+async def delete_job(
+    job_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     require_role(current_user, "hr")
     job = db.get(JobPost, job_id)
     if not job or job.organization_id != current_user.organization_id:
         raise HTTPException(status_code=404, detail="Ilan bulunamadi")
-    return {"job": serialize_job(job)}
+    db.delete(job)
+    db.commit()
+    return {"deleted": True, "job_id": job_id}
 
 
 @app.get("/jobs/{job_id}/applications")
@@ -756,6 +1032,112 @@ async def upload_cv(file: UploadFile = File(...)):
         if temp_path.exists():
             os.unlink(temp_path)
 
+
+@app.post("/preview-cv")
+async def preview_cv(file: UploadFile = File(...)):
+    """CV'yi işler ama Neo4j/R2 kaydı yapmadan aday onboarding önizlemesi döner."""
+    allowed_extensions = {".pdf", ".docx"}
+    file_ext = Path(file.filename).suffix.lower()
+    if file_ext not in allowed_extensions:
+        raise HTTPException(status_code=400, detail="Desteklenmeyen dosya türü. Sadece PDF ve DOCX kabul edilir.")
+
+    staged_dir = Path(tempfile.gettempdir()) / "talentforge_staged_cvs"
+    staged_dir.mkdir(parents=True, exist_ok=True)
+    token = str(uuid.uuid4())
+    staged_path = staged_dir / f"{token}{file_ext}"
+    staged_path.write_bytes(await file.read())
+
+    try:
+        result = get_pipeline().extract_only(staged_path)
+        if result is None:
+            raise HTTPException(status_code=500, detail="CV işlenirken hata oluştu. Lütfen tekrar deneyin.")
+        result["stage_token"] = token
+        result["original_name"] = file.filename
+        STAGED_CVS[token] = {
+            "path": str(staged_path),
+            "original_name": file.filename,
+            "extraction": result,
+            "file_hash": result.get("file_hash"),
+        }
+        return result
+    except HTTPException:
+        if staged_path.exists():
+            os.unlink(staged_path)
+        raise
+    except Exception as e:
+        if staged_path.exists():
+            os.unlink(staged_path)
+        logger.error(f"Preview upload error: {e}")
+        raise HTTPException(status_code=500, detail="CV işlenirken hata oluştu. Lütfen tekrar deneyin.")
+
+
+@app.post("/commit-cvs")
+async def commit_cvs(
+    payload: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Önizlenen CV'leri Devam et sonrasında Neo4j/R2'ye kaydeder."""
+    tokens = payload.get("tokens") or []
+    if not isinstance(tokens, list) or not tokens:
+        raise HTTPException(status_code=400, detail="Kaydedilecek CV bulunamadı.")
+
+    committed = []
+    for token in tokens:
+        staged = STAGED_CVS.get(str(token))
+        if not staged:
+            continue
+        staged_path = Path(staged["path"])
+        extraction_data = dict(staged["extraction"])
+        for key in ("stage_token", "original_name", "preview_only", "file_hash"):
+            extraction_data.pop(key, None)
+        extraction = CVExtraction.model_validate(extraction_data)
+        cv_id = get_pipeline().commit_extraction(extraction, file_hash=staged.get("file_hash"))
+        if cv_id:
+            object_name = None
+            try:
+                object_name = r2_upload(cv_id, staged_path, staged["original_name"])
+                with get_neo4j_driver().session() as session:
+                    session.run("""
+                        MATCH (c:Candidate {id: $id})
+                        SET c.cv_object_name = $object_name,
+                            c.cv_original_name = $original_name
+                    """, id=cv_id, object_name=object_name, original_name=staged["original_name"])
+            except Exception as e:
+                logger.warning(f"R2 yükleme başarısız (commit tamamlandı): {e}")
+            committed.append({
+                "stage_token": token,
+                "cv_id": cv_id,
+                "candidate_name": extraction.candidate_name,
+                "original_name": staged["original_name"],
+                "cv_object_name": object_name,
+                "cv_available": bool(object_name),
+            })
+            if current_user.role == "candidate" and current_user.candidate_profile:
+                cv_profile = (
+                    db.query(CandidateCVProfile)
+                    .filter(CandidateCVProfile.neo4j_candidate_id == cv_id)
+                    .first()
+                )
+                if not cv_profile:
+                    cv_profile = CandidateCVProfile(
+                        candidate_profile_id=current_user.candidate_profile.id,
+                        neo4j_candidate_id=cv_id,
+                        file_name=staged["original_name"],
+                        title=extraction.experiences[0].role_title if extraction.experiences else None,
+                        summary=extraction.summary,
+                    )
+                    db.add(cv_profile)
+                if not current_user.candidate_profile.neo4j_candidate_id:
+                    current_user.candidate_profile.neo4j_candidate_id = cv_id
+                    db.add(current_user.candidate_profile)
+                db.commit()
+        if staged_path.exists():
+            os.unlink(staged_path)
+        STAGED_CVS.pop(str(token), None)
+
+    return {"committed": committed}
+
 @app.get("/download-cv/{candidate_id}")
 async def download_cv(candidate_id: str):
     """Aday CV dosyasını R2'den indirir"""
@@ -799,8 +1181,63 @@ async def download_cv(candidate_id: str):
     )
 
 
+@app.delete("/candidate-cvs/{candidate_id}")
+async def delete_candidate_cv(
+    candidate_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Adayın seçtiği CV profilini Neo4j/R2/PostgreSQL izleriyle siler."""
+    object_name = None
+    with get_neo4j_driver().session() as session:
+        record = session.run("""
+            MATCH (c:Candidate {id: $id})
+            RETURN c.cv_object_name AS object_name
+        """, id=candidate_id).single()
+        if not record:
+            raise HTTPException(status_code=404, detail="CV profili bulunamadı")
+        object_name = record["object_name"]
+
+        session.run("""
+            MATCH (c:Candidate {id: $id})
+            OPTIONAL MATCH (c)-[:HAS_EXPERIENCE]->(e:Experience)
+            OPTIONAL MATCH (c)-[:HAS_EDUCATION]->(ed:Education)
+            OPTIONAL MATCH (c)-[:HAS_PROJECT]->(p:Project)
+            WITH c, collect(DISTINCT e) + collect(DISTINCT ed) + collect(DISTINCT p) AS owned_nodes
+            FOREACH (n IN owned_nodes | DETACH DELETE n)
+            DETACH DELETE c
+        """, id=candidate_id)
+
+    if object_name:
+        try:
+            r2_delete(object_name)
+        except Exception as e:
+            logger.warning(f"R2 silme başarısız: {e}")
+
+    cv_profile = (
+        db.query(CandidateCVProfile)
+        .filter(CandidateCVProfile.neo4j_candidate_id == candidate_id)
+        .first()
+    )
+    profile = cv_profile.candidate_profile if cv_profile else (
+        db.query(CandidateProfile)
+        .filter(CandidateProfile.neo4j_candidate_id == candidate_id)
+        .first()
+    )
+    if profile:
+        db.query(JobApplication).filter(JobApplication.candidate_profile_id == profile.id).delete()
+        if profile.neo4j_candidate_id == candidate_id:
+            profile.neo4j_candidate_id = None
+        db.add(profile)
+        if cv_profile:
+            db.delete(cv_profile)
+        db.commit()
+
+    return {"deleted": True, "candidate_id": candidate_id}
+
+
 @app.get("/candidates/{candidate_id}")
-async def candidate_detail(candidate_id: str):
+async def candidate_detail(candidate_id: str, db: Session = Depends(get_db)):
     """Aday detayını popup/detay ekranı için döner"""
     with get_neo4j_driver().session() as session:
         record = session.run("""
@@ -882,15 +1319,16 @@ async def candidate_detail(candidate_id: str):
     data["cv_available"] = bool(data.get("cv_object_name") or _find_local_cv_by_hash(data.get("file_hash")))
     if data.get("file_hash"):
         data["file_hash_short"] = f"{data['file_hash'][:10]}..."
+    data.update(candidate_membership(db, candidate_id))
     return data
 
 
 @app.post("/search-candidates", response_model=List[Dict])
-async def search_candidates(query: QuerySpec):
+async def search_candidates(query: QuerySpec, db: Session = Depends(get_db)):
     """İK sorgusuna göre en uygun adayları getir"""
     try:
         results = get_matcher().search(query, limit=10)
-        return results
+        return enrich_candidate_membership(results, db)
     except Exception as e:
         logger.error(f"Search error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -931,7 +1369,7 @@ def get_nl_parser():
     return _nl_parser
 
 @app.post("/nl-search")
-async def nl_search(body: dict):
+async def nl_search(body: dict, db: Session = Depends(get_db)):
     """
     Doğal dil sorgusu → QuerySpec → Aday arama
     Body: {"query": "5 yıl Python deneyimi olan senior backend developer"}
@@ -942,7 +1380,7 @@ async def nl_search(body: dict):
 
     try:
         query_spec = get_nl_parser().parse(nl_text)
-        results = get_matcher().search(query_spec, limit=10)
+        results = enrich_candidate_membership(get_matcher().search(query_spec, limit=10), db)
         return {
             "parsed_query": query_spec.model_dump(),
             "results": results,
@@ -950,6 +1388,125 @@ async def nl_search(body: dict):
     except Exception as e:
         logger.error(f"NL search error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/messages")
+async def list_conversations(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.role == "hr":
+        query = db.query(Conversation).filter(Conversation.hr_user_id == current_user.id)
+    else:
+        query = db.query(Conversation).filter(Conversation.candidate_user_id == current_user.id)
+    conversations = query.order_by(
+        Conversation.last_message_at.desc().nullslast(),
+        Conversation.created_at.desc(),
+    ).all()
+    serialized = [serialize_conversation(conversation, current_user, db) for conversation in conversations]
+    return {
+        "conversations": serialized,
+        "unread_count": sum(item["unread_count"] for item in serialized),
+    }
+
+
+@app.post("/messages/conversations")
+async def create_or_get_conversation(
+    payload: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    require_role(current_user, "hr")
+    candidate_user_id = payload.get("candidate_user_id")
+    if not candidate_user_id:
+        raise HTTPException(status_code=400, detail="Aday kullanici bilgisi bulunamadi")
+    candidate_user = db.get(User, candidate_user_id)
+    if not candidate_user or candidate_user.role != "candidate":
+        raise HTTPException(status_code=404, detail="Aday kullanici bulunamadi")
+
+    conversation = (
+        db.query(Conversation)
+        .filter(
+            Conversation.hr_user_id == current_user.id,
+            Conversation.candidate_user_id == candidate_user.id,
+        )
+        .first()
+    )
+    if not conversation:
+        conversation = Conversation(
+            hr_user_id=current_user.id,
+            candidate_user_id=candidate_user.id,
+            candidate_neo4j_id=payload.get("candidate_neo4j_id"),
+        )
+        db.add(conversation)
+        db.flush()
+
+    initial_message = (payload.get("initial_message") or "").strip()
+    if initial_message:
+        message = Message(
+            conversation_id=conversation.id,
+            sender_user_id=current_user.id,
+            body=initial_message,
+        )
+        conversation.last_message_at = func.now()
+        db.add(message)
+        db.add(conversation)
+    db.commit()
+    db.refresh(conversation)
+    return {"conversation": serialize_conversation(conversation, current_user, db)}
+
+
+@app.get("/messages/{conversation_id}")
+async def get_messages(
+    conversation_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    conversation = db.get(Conversation, conversation_id)
+    if not conversation or current_user.id not in {conversation.hr_user_id, conversation.candidate_user_id}:
+        raise HTTPException(status_code=404, detail="Konusma bulunamadi")
+    db.query(Message).filter(
+        Message.conversation_id == conversation.id,
+        Message.sender_user_id != current_user.id,
+        Message.read_at.is_(None),
+    ).update({"read_at": func.now()}, synchronize_session=False)
+    db.commit()
+    messages = (
+        db.query(Message)
+        .filter(Message.conversation_id == conversation.id)
+        .order_by(Message.created_at.asc())
+        .all()
+    )
+    return {
+        "conversation": serialize_conversation(conversation, current_user, db),
+        "messages": [serialize_message(message) for message in messages],
+    }
+
+
+@app.post("/messages/{conversation_id}")
+async def send_message(
+    conversation_id: str,
+    payload: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    conversation = db.get(Conversation, conversation_id)
+    if not conversation or current_user.id not in {conversation.hr_user_id, conversation.candidate_user_id}:
+        raise HTTPException(status_code=404, detail="Konusma bulunamadi")
+    body = (payload.get("body") or "").strip()
+    if not body:
+        raise HTTPException(status_code=400, detail="Mesaj bos olamaz")
+    message = Message(
+        conversation_id=conversation.id,
+        sender_user_id=current_user.id,
+        body=body,
+    )
+    conversation.last_message_at = func.now()
+    db.add(message)
+    db.add(conversation)
+    db.commit()
+    db.refresh(message)
+    return {"message": serialize_message(message)}
 
 if __name__ == "__main__":
     import uvicorn

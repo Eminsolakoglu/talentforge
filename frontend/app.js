@@ -9,17 +9,25 @@ const state = {
   user: JSON.parse(localStorage.getItem("talentforge_user") || "null"),
   jobs: [],
   applications: [],
+  recommendations: [],
   dashboardSummary: null,
   recentSearch: JSON.parse(localStorage.getItem("talentforge_recent_search") || "null"),
   savedSearches: JSON.parse(localStorage.getItem("talentforge_saved_searches") || "[]"),
   savedCandidates: JSON.parse(localStorage.getItem("talentforge_saved_candidates") || "[]"),
+  candidateProfiles: JSON.parse(localStorage.getItem("talentforge_candidate_profiles") || "[]"),
+  candidateUploadedFiles: [],
   jobFilters: { title: "", seniority: "", location: "" },
   lastCandidates: new Map(),
+  conversations: [],
+  activeConversationId: null,
+  activeMessages: [],
+  messagesUnread: 0,
 };
 
 const views = {
   landing: document.querySelector("#landing-view"),
   login: document.querySelector("#auth-view"),
+  candidateSetup: document.querySelector("#candidate-setup-view"),
   dashboard: document.querySelector("#dashboard-view"),
 };
 
@@ -245,6 +253,344 @@ async function uploadLandingCv(file) {
   }
 }
 
+function persistCandidateProfiles() {
+  localStorage.setItem("talentforge_candidate_profiles", JSON.stringify(state.candidateProfiles));
+}
+
+function setCandidateUploadStatus(text, type = "") {
+  const targets = [
+    $("[data-candidate-upload-status]"),
+    $("[data-profile-upload-status]"),
+  ].filter(Boolean);
+  targets.forEach((status) => {
+    status.textContent = text || "";
+    status.dataset.type = type;
+    status.classList.toggle("is-loading", type === "loading");
+  });
+}
+
+function extractCandidateProfile(data, fileName) {
+  const skills = (data.skills || []).map((skill) => skill.name || skill).filter(Boolean);
+  const experiences = data.experiences || [];
+  const educations = data.educations || [];
+  const projects = data.projects || [];
+  const firstExperience = experiences[0] || {};
+  const totalYears =
+    data.total_experience_years ??
+    data.experience_years ??
+    estimateExperienceYears(experiences);
+  return {
+    id: data.cv_id || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    stage_token: data.stage_token || null,
+    file_name: fileName,
+    name: data.candidate_name || data.name || state.user?.full_name || "Aday",
+    title: firstExperience.role_title || firstExperience.role || data.title || data.profession || "Profil",
+    summary: data.summary || "CV işlendi; aday profili bilgi grafına kaydedildi.",
+    location: data.location || "-",
+    experience_years: totalYears,
+    skills,
+    educations,
+    experiences,
+    projects,
+    certifications: data.certifications || [],
+    languages: data.languages || [],
+    cv_id: data.cv_id,
+  };
+}
+
+function estimateExperienceYears(experiences = []) {
+  if (!experiences.length) return "";
+  const explicitYears = experiences
+    .map((exp) => Number(exp.years_experience || exp.years || 0))
+    .filter((year) => year > 0);
+  if (explicitYears.length) return Math.round(explicitYears.reduce((sum, year) => sum + year, 0));
+  return `${experiences.length} deneyim`;
+}
+
+function formatExperienceFact(profile) {
+  if (profile.experience_years !== "" && profile.experience_years !== undefined && profile.experience_years !== null) {
+    return typeof profile.experience_years === "number"
+      ? `${profile.experience_years} yıl deneyim`
+      : String(profile.experience_years);
+  }
+  return (profile.experiences || []).length ? `${profile.experiences.length} deneyim` : "Deneyim bilgisi yok";
+}
+
+function renderMiniList(items, formatter, emptyText) {
+  const list = (items || []).filter(Boolean);
+  if (!list.length) return `<p class="muted-line">${escapeHtml(emptyText)}</p>`;
+  return `<div class="mini-list">${list.map((item) => `<p>${formatter(item)}</p>`).join("")}</div>`;
+}
+
+function renderProfileSections(profile) {
+  return `
+    <div class="profile-section-grid">
+      <section>
+        <h4>Deneyim</h4>
+        ${renderMiniList(profile.experiences, (exp) => `
+          <strong>${escapeHtml(exp.role_title || exp.role || "Rol")}</strong>
+          <span>${escapeHtml(exp.company_name || exp.company || "-")} / ${escapeHtml([exp.start_date, exp.end_date || (exp.is_current ? "Devam" : "")].filter(Boolean).join(" - ") || "-")}</span>
+        `, "Deneyim bilgisi bulunamadı.")}
+      </section>
+      <section>
+        <h4>Eğitim</h4>
+        ${renderMiniList(profile.educations, (edu) => `
+          <strong>${escapeHtml(edu.institution || "Kurum")}</strong>
+          <span>${escapeHtml([edu.degree, edu.field, edu.end_year].filter(Boolean).join(" / ") || "-")}</span>
+        `, "Eğitim bilgisi bulunamadı.")}
+      </section>
+      <section>
+        <h4>Projeler</h4>
+        ${renderMiniList(profile.projects, (project) => `
+          <strong>${escapeHtml(project.name || "Proje")}</strong>
+          <span>${escapeHtml(project.description || project.role || "-")}</span>
+        `, "Proje bilgisi bulunamadı.")}
+      </section>
+      <section>
+        <h4>Dil & sertifika</h4>
+        ${renderPills([...(profile.languages || []), ...(profile.certifications || [])])}
+      </section>
+    </div>
+  `;
+}
+
+function renderProfileCard(profile, index, { actions = false } = {}) {
+  const firstExperience = (profile.experiences || [])[0] || {};
+  const experienceSummary = firstExperience.role_title || firstExperience.role
+    ? `${firstExperience.role_title || firstExperience.role} / ${firstExperience.company_name || firstExperience.company || "-"}`
+    : formatExperienceFact(profile);
+  return `
+    <article class="extracted-profile-card profile-card-rich">
+      <div class="profile-card-head">
+        <div>
+          <p class="eyebrow">Profil ${index + 1}</p>
+          <h3>${escapeHtml(profile.title || "CV profili")}</h3>
+          <p>${escapeHtml(experienceSummary)}</p>
+        </div>
+        ${actions ? `
+          <div class="profile-card-actions">
+            <button class="ghost-btn" type="button" data-open-cv-profile="${index}">İncele</button>
+            <button class="ghost-btn danger" type="button" data-delete-cv-profile="${index}">Sil</button>
+          </div>
+        ` : ""}
+      </div>
+      <div class="profile-facts">
+        <span>${escapeHtml(formatExperienceFact(profile))}</span>
+      </div>
+      <section>
+        <h4>Yetenekler</h4>
+        <div class="pill-list">
+          ${(profile.skills || []).slice(0, 10).map((skill) => `<span>${escapeHtml(skill)}</span>`).join("") || "<span>Yetenek bulunamadı</span>"}
+        </div>
+      </section>
+    </article>
+  `;
+}
+
+function renderCandidateProfilePreview() {
+  const preview = $("[data-candidate-profile-preview]");
+  const continueButton = $("[data-candidate-setup-continue]");
+  if (!preview) return;
+  if (!state.candidateProfiles.length) {
+    preview.innerHTML = "";
+    if (continueButton) continueButton.hidden = true;
+    return;
+  }
+  preview.innerHTML = state.candidateProfiles.map((profile, index) => renderProfileCard(profile, index)).join("");
+  if (continueButton) continueButton.hidden = false;
+}
+
+function renderUploadedFileList() {
+  const root = $("[data-uploaded-file-list]");
+  if (!root) return;
+  if (!state.candidateUploadedFiles.length) {
+    root.innerHTML = "";
+    return;
+  }
+  root.innerHTML = `
+    <p>Yüklenenler:</p>
+    <div class="uploaded-file-pills">
+      ${state.candidateUploadedFiles.map((file, index) => `
+        <button type="button" data-open-uploaded-file="${index}">
+          ${escapeHtml(file.name)}
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
+
+function openUploadedFileModal(index) {
+  const file = state.candidateUploadedFiles[Number(index)];
+  if (!file) return;
+  let modal = $(".file-preview-modal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.className = "file-preview-modal candidate-modal";
+    modal.innerHTML = `
+      <div class="candidate-modal-backdrop" data-modal-close></div>
+      <article class="candidate-modal-card wide" role="dialog" aria-modal="true" aria-label="Yüklenen CV">
+        <button class="modal-close" type="button" data-modal-close aria-label="Kapat">×</button>
+        <div class="file-preview-body"></div>
+      </article>
+    `;
+    document.body.appendChild(modal);
+  }
+  const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+  $(".file-preview-body", modal).innerHTML = `
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">Yüklenen dosya</p>
+        <h2>${escapeHtml(file.name)}</h2>
+        <p>${isPdf ? "PDF önizlemesi aşağıda gösteriliyor." : "DOCX dosyaları tarayıcı içinde doğrudan render edilemeyebilir; dosyayı yeni sekmede açabilirsin."}</p>
+      </div>
+      <a class="primary-btn small" href="${file.url}" target="_blank" rel="noreferrer">Dosyayı aç</a>
+    </div>
+    ${isPdf ? `<iframe class="file-preview-frame" src="${file.url}" title="${escapeHtml(file.name)}"></iframe>` : ""}
+  `;
+  modal.classList.add("active");
+  document.body.classList.add("modal-open");
+}
+
+async function commitCandidateProfiles({ stayOnProfile = false } = {}) {
+  const tokens = state.candidateProfiles.map((profile) => profile.stage_token).filter(Boolean);
+  if (!tokens.length) {
+    if (stayOnProfile) {
+      renderCandidateProfilesPanel();
+      return;
+    }
+    showView("dashboard");
+    setDashboardTab("overview");
+    return;
+  }
+  setCandidateUploadStatus("CV'ler Neo4j bilgi grafına kaydediliyor...", "loading");
+  const data = await api("/commit-cvs", {
+    method: "POST",
+    body: JSON.stringify({ tokens }),
+  });
+  const committed = data.committed || [];
+  state.candidateProfiles = state.candidateProfiles.map((profile) => {
+    const match = committed.find((item) => item.stage_token === profile.stage_token);
+    return match ? { ...profile, cv_id: match.cv_id, cv_available: match.cv_available, cv_object_name: match.cv_object_name, stage_token: null } : profile;
+  });
+  persistCandidateProfiles();
+  setCandidateUploadStatus(`${committed.length} CV Neo4j bilgi grafına kaydedildi.`, "ok");
+  renderCandidateProfilesPanel();
+  if (stayOnProfile) {
+    setDashboardTab("profile");
+    return;
+  }
+  showView("dashboard");
+  setDashboardTab("overview");
+}
+
+function getProfileDownloadUrl(profile) {
+  if (profile.cv_id) return `${API_BASE}/download-cv/${profile.cv_id}`;
+  const localFile = state.candidateUploadedFiles.find((file) => file.name === profile.file_name);
+  return localFile?.url || "";
+}
+
+function openCvProfileModal(index) {
+  const profile = state.candidateProfiles[Number(index)];
+  if (!profile) return;
+  let modal = $(".cv-profile-modal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.className = "cv-profile-modal candidate-modal";
+    modal.innerHTML = `
+      <div class="candidate-modal-backdrop" data-modal-close></div>
+      <article class="candidate-modal-card wide" role="dialog" aria-modal="true" aria-label="CV profili">
+        <button class="modal-close" type="button" data-modal-close aria-label="Kapat">×</button>
+        <div class="cv-profile-modal-body candidate-modal-body"></div>
+      </article>
+    `;
+    document.body.appendChild(modal);
+  }
+  const downloadUrl = getProfileDownloadUrl(profile);
+  $(".cv-profile-modal-body", modal).innerHTML = `
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">Profil ${Number(index) + 1}</p>
+        <h2>${escapeHtml(profile.title || "CV profili")}</h2>
+        <p>${escapeHtml(profile.summary || "Özet bulunamadı.")}</p>
+      </div>
+      ${downloadUrl
+        ? `<a class="primary-btn small" href="${downloadUrl}" target="_blank" rel="noreferrer">CV'yi indir</a>`
+        : `<button class="ghost-btn" type="button" disabled>CV yok</button>`}
+    </div>
+    <div class="profile-facts">
+      <span>${escapeHtml(profile.file_name || "CV")}</span>
+      <span>${escapeHtml(profile.location || "-")}</span>
+      <span>${escapeHtml(formatExperienceFact(profile))}</span>
+      <span>${escapeHtml((profile.educations || [])[0]?.institution || "Okul bilgisi yok")}</span>
+    </div>
+    ${renderProfileSections(profile)}
+    <section>
+      <h3>Yetenekler</h3>
+      ${renderPills(profile.skills || [])}
+    </section>
+  `;
+  modal.classList.add("active");
+  document.body.classList.add("modal-open");
+}
+
+async function deleteCvProfile(index) {
+  const profile = state.candidateProfiles[Number(index)];
+  if (!profile) return;
+  if (profile.cv_id && state.token) {
+    await api(`/candidate-cvs/${profile.cv_id}`, { method: "DELETE" });
+  }
+  state.candidateProfiles.splice(Number(index), 1);
+  persistCandidateProfiles();
+  renderCandidateProfilesPanel();
+  renderProfileHero(state.dashboardSummary || {});
+}
+
+function addCandidateCvFromDashboard() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".pdf,.docx";
+  input.multiple = true;
+  input.addEventListener("change", async () => {
+    try {
+      await uploadCandidateCvs(input.files);
+      await commitCandidateProfiles({ stayOnProfile: true });
+    } catch (error) {
+      setCandidateUploadStatus(error.message, "error");
+    }
+  });
+  input.click();
+}
+
+async function uploadCandidateCvs(files) {
+  const list = [...(files || [])].filter(Boolean);
+  if (!list.length) return;
+  const uploadedProfiles = [];
+  setCandidateUploadStatus(`${list.length} CV işleniyor...`, "loading");
+  for (let index = 0; index < list.length; index += 1) {
+    const file = list[index];
+    setCandidateUploadStatus(`[${index + 1}/${list.length}] ${file.name} işleniyor...`, "loading");
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await fetch(`${API_BASE}/preview-cv`, {
+      method: "POST",
+      body: formData,
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(formatApiError(data.detail));
+    uploadedProfiles.push(extractCandidateProfile(data, file.name));
+    state.candidateUploadedFiles.push({
+      name: file.name,
+      type: file.type,
+      url: URL.createObjectURL(file),
+    });
+    renderUploadedFileList();
+  }
+  state.candidateProfiles = [...uploadedProfiles, ...state.candidateProfiles].slice(0, 8);
+  persistCandidateProfiles();
+  renderCandidateProfilePreview();
+  setCandidateUploadStatus(`${uploadedProfiles.length} CV işlendi. Devam ettiğinde Neo4j bilgi grafına kaydedilecek.`, "ok");
+}
+
 function saveSession(data) {
   state.token = data.access_token;
   state.user = data.user;
@@ -270,11 +616,16 @@ function syncAuthChrome() {
 
 function showView(name) {
   if (name === "dashboard" && !state.token) name = "login";
+  if (name === "candidateSetup" && !state.token) name = "login";
   syncAuthChrome();
   Object.values(views).forEach((view) => view?.classList.remove("active"));
   views[name]?.classList.add("active");
-  if (name === "dashboard") loadDashboard();
-  updateLocationHash(name);
+  if (name === "dashboard") {
+    setDashboardTab("overview");
+    loadDashboard();
+  }
+  if (name === "candidateSetup") renderCandidateProfilePreview();
+  updateLocationHash(name, name === "dashboard" ? "overview" : null);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -337,6 +688,13 @@ function setDashboardTab(tab) {
   if (topButton) topButton.hidden = state.role !== "hr" || tab !== "overview";
   updateDashboardHeader(tab);
   if (state.role === "hr" && tab === "shortlist") renderSavedCandidatesPanel();
+  if (state.role === "candidate" && tab === "matches") {
+    renderCandidateMatchesPanel();
+    loadCandidateRecommendations()
+      .then(() => renderCandidateMatchesPanel())
+      .catch((error) => console.warn(error));
+  }
+  if (tab === "messages") loadMessages().catch((error) => console.warn(error));
   updateLocationHash("dashboard", tab);
 }
 
@@ -348,12 +706,14 @@ function updateDashboardHeader(tab) {
     search: "Aday arama",
     jobs: "İlanlar",
     shortlist: "Kaydedilen adaylar",
+    messages: "Mesajlar",
   };
   const candidateLabels = {
     overview: "Aday anasayfa",
     profile: "Profilim",
     matches: "Eşleşmeler",
-    applications: "Başvurular",
+    applications: "Ba?vurular",
+    messages: "Mesajlar",
   };
   if (roleLabel) {
     roleLabel.textContent = state.role === "hr"
@@ -720,14 +1080,137 @@ function renderRecentMatches() {
 function renderProfileHero(summary) {
   const hero = $("#candidate-dashboard .profile-hero");
   if (!hero || !state.user) return;
-  const profile = state.user.profile || {};
   hero.innerHTML = `
     <div>
       <p class="eyebrow">Aday profili</p>
       <h2>${state.user.full_name || "Aday"}</h2>
-      <p>${profile.profession || "Rol belirtilmedi"} / ${profile.school || "Okul belirtilmedi"} / ${profile.experience_years || 0} yıl deneyim</p>
+      <p>CV profillerini yönet, uygun ilanları takip et ve başvurularını izle.</p>
     </div>
-    <span class="status-pill">${summary.applications || 0} başvuru</span>
+    <span class="status-pill">${state.candidateProfiles.length || 0} CV işlendi</span>
+  `;
+}
+
+function candidateSkillSet() {
+  return new Set(
+    (state.candidateProfiles || [])
+      .flatMap((profile) => profile.skills || [])
+      .map((skill) => String(skill).toLowerCase())
+  );
+}
+
+function scoreJobForCandidate(job, skills) {
+  const required = [...(job.must_have_skills || []), ...(job.nice_to_have_skills || [])];
+  if (!required.length || !skills.size) return 0;
+  const matched = required.filter((skill) => skills.has(String(skill).toLowerCase())).length;
+  return Math.round((matched / required.length) * 100);
+}
+
+function calculateProfileCompletion(profile) {
+  if (!profile) return 0;
+  const checks = [
+    profile.name,
+    profile.title,
+    profile.summary,
+    profile.location,
+    (profile.skills || []).length >= 3,
+    (profile.experiences || []).length,
+    (profile.educations || []).length,
+    (profile.languages || []).length,
+    profile.cv_id,
+  ];
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+}
+
+function renderCandidateOverview(summary = {}) {
+  const panel = $('#candidate-dashboard [data-panel="overview"]');
+  if (!panel || !state.user) return;
+  const profiles = state.candidateProfiles || [];
+  const primary = profiles[0] || {};
+  const skills = candidateSkillSet();
+  const applications = state.applications || [];
+  const recommended = (state.recommendations || []).slice(0, 4);
+  const completion = calculateProfileCompletion(primary);
+  const skillNames = [...skills].slice(0, 8).map((skill) => skill.replace(/\b\w/g, (char) => char.toUpperCase()));
+  const signals = [
+    skillNames.length ? `${skillNames.slice(0, 4).join(", ")} becerileri profilde öne çıkıyor.` : "CV yüklendiğinde yetenek sinyalleri burada oluşacak.",
+    primary.experiences?.length ? `${primary.experiences.length} deneyim kaydı bilgi grafına işlendi.` : "Deneyim bilgisi tamamlanmayı bekliyor.",
+    primary.educations?.length ? `${primary.educations.length} eğitim kaydı çıkarıldı.` : "Eğitim bilgisi bulunamadı.",
+  ];
+
+  panel.innerHTML = `
+    <div class="profile-hero">
+      <div>
+        <p class="eyebrow">Aday profili</p>
+        <h2>${escapeHtml(state.user.full_name || primary.name || "Aday")}</h2>
+        <p>${escapeHtml([
+          primary.title,
+          primary.location,
+          formatExperienceFact(primary),
+        ].filter(Boolean).join(" / ") || "CV profillerini yönet, uygun ilanları takip et ve başvurularını izle.")}</p>
+      </div>
+      <span class="status-pill">${profiles.length || 0} CV işlendi</span>
+    </div>
+    <div class="metric-grid">
+      <article><span>Uygun ilan</span><strong>${state.recommendations.length}</strong></article>
+      <article><span>Başvuru</span><strong>${applications.length}</strong></article>
+      <article><span>Profil doluluk</span><strong>${completion}%</strong></article>
+      <article><span>Mesaj</span><strong>${state.messagesUnread || 0}</strong></article>
+    </div>
+    <div class="dash-panels">
+      <section class="dash-panel">
+        <h2>Profil sinyalleri</h2>
+        ${signals.map((signal) => `<p>${escapeHtml(signal)}</p>`).join("")}
+        <div class="progress"><span style="width:${completion}%"></span></div>
+      </section>
+      <section class="dash-panel">
+        <h2>Önerilen pozisyonlar</h2>
+        ${
+          recommended.length
+            ? recommended.map((job, index) => `
+              <button class="rank-row ${index === 0 ? "hot" : ""}" type="button" data-job-detail="${escapeHtml(job.job?.id || job.id)}">
+                <span class="rank">${String(index + 1).padStart(2, "0")}</span>
+                <div>
+                  <strong>${escapeHtml(job.job?.title || job.title)}</strong>
+                  <p>${escapeHtml(job.match_score ? `${job.match_score} uyum skoru` : "Yeni ilan")}</p>
+                </div>
+                <b>${job.job?.application ? "Başvuruldu" : "İncele"}</b>
+              </button>
+            `).join("")
+            : `<div class="empty-state compact"><h3>Henüz öneri yok</h3><p>İlan yayınlandığında profilinle karşılaştırılacak.</p></div>`
+        }
+      </section>
+    </div>
+  `;
+}
+
+function renderCandidateProfilesPanel() {
+  const panel = $('#candidate-dashboard [data-panel="profile"]');
+  if (!panel) return;
+  const profiles = state.candidateProfiles || [];
+  if (!profiles.length) {
+    panel.innerHTML = `
+      <div class="empty-state">
+        <h3>Henüz CV profili yok</h3>
+        <p>CV yüklediğinde çıkarılan profil bilgileri burada görünecek.</p>
+        <button class="primary-btn small" type="button" data-add-candidate-cv>CV yükle</button>
+        <p class="candidate-upload-status" data-profile-upload-status></p>
+      </div>
+    `;
+    return;
+  }
+  panel.innerHTML = `
+    <div class="candidate-profile-preview in-dashboard">
+      ${profiles.map((profile, index) => renderProfileCard(profile, index, { actions: true })).join("")}
+    </div>
+    <section class="add-cv-panel">
+      <div>
+        <p class="eyebrow">Yeni CV</p>
+        <h3>Başka bir rol için yeni profil oluştur</h3>
+        <p>AI Developer, Cloud Engineer veya farklı ilanlar için hazırladığın ayrı CV'leri ekleyebilirsin.</p>
+      </div>
+      <button class="primary-btn small" type="button" data-add-candidate-cv>Yeni CV ekle</button>
+    </section>
+    <p class="candidate-upload-status" data-profile-upload-status></p>
   `;
 }
 
@@ -748,15 +1231,15 @@ async function loadDashboard() {
       ]);
       renderHrOverview(summary);
       await loadJobs();
+      loadMessages().catch((error) => console.warn(error));
     } else {
-      renderProfileHero(summary);
-      renderMetricGrid($("#candidate-dashboard .metric-grid"), [
-        { label: "Uygun ilan", value: metrics.matching_jobs ?? summary.total_jobs ?? 0 },
-        { label: "Başvuru", value: metrics.applications ?? summary.applications ?? 0 },
-        { label: "Profil doluluk", value: `${metrics.profile_completion ?? summary.profile_completion ?? 60}%` },
-        { label: "Geri bildirim", value: metrics.feedback ?? summary.feedback ?? 0 },
-      ]);
+      await loadJobs();
       await loadApplications();
+      await loadCandidateRecommendations();
+      renderCandidateOverview(summary);
+      renderCandidateMatchesPanel();
+      renderCandidateProfilesPanel();
+      loadMessages().catch((error) => console.warn(error));
     }
   } catch (error) {
     console.warn(error);
@@ -800,6 +1283,7 @@ function renderJobs() {
         <div class="job-actions">
           <button class="ghost-btn" type="button" data-job-applications="${escapeHtml(job.id)}">${job.application_count || 0} başvuru</button>
           <button class="ghost-btn" type="button" data-job-detail="${escapeHtml(job.id)}">Detay</button>
+          <button class="ghost-btn danger" type="button" data-delete-job="${escapeHtml(job.id)}">Sil</button>
         </div>
       </article>
     `).join("")
@@ -1191,11 +1675,68 @@ function renderSearchPanel() {
 
 async function loadApplications() {
   try {
-    const data = await api("/applications");
+    const data = await api("/applications/me");
     state.applications = data.applications || [];
   } catch (error) {
     console.warn(error);
   }
+}
+
+async function loadCandidateRecommendations() {
+  try {
+    const data = await api("/candidate/recommendations");
+    state.recommendations = data.recommendations || [];
+  } catch (error) {
+    console.warn(error);
+    state.recommendations = [];
+  }
+}
+
+function renderCandidateMatchesPanel() {
+  const panel = $('#candidate-dashboard [data-panel="matches"]');
+  if (!panel) return;
+  const rows = state.recommendations || [];
+  panel.innerHTML = `
+    <div class="dash-card">
+      <div class="panel-heading">
+        <h2>Önerilen ilanlar</h2>
+        <span class="status-pill">${rows.length} eşleşme</span>
+      </div>
+      <div class="candidate-table">
+        <div class="table-row head"><span>Pozisyon</span><span>Skor</span><span>Neden?</span><span>Aksiyon</span></div>
+        ${
+          rows.length
+            ? rows.map((item) => {
+                const job = item.job || {};
+                const reasons = item.reasons || [];
+                return `
+                  <div class="table-row">
+                    <span>${escapeHtml(job.title || "-")}</span>
+                    <span>${escapeHtml(item.match_score ?? "-")}</span>
+                    <span>${escapeHtml(reasons.join(" / ") || "Matcher skoru ile önerildi.")}</span>
+                    <span class="row-actions">
+                      <button type="button" data-job-detail="${escapeHtml(job.id || "")}">İncele</button>
+                      ${job.application ? `<button type="button" disabled>Başvuruldu</button>` : `<button type="button" data-apply-job="${escapeHtml(job.id || "")}">Başvur</button>`}
+                    </span>
+                  </div>`;
+              }).join("")
+            : `<div class="table-row"><span>Henüz uygun ilan yok</span><span>-</span><span>CV profilin matcher ile ilanlara göre skorlanacak.</span><span>-</span></div>`
+        }
+      </div>
+    </div>
+  `;
+}
+
+async function applyToJob(jobId) {
+  if (!jobId) return;
+  await api(`/jobs/${jobId}/apply`, {
+    method: "POST",
+    body: JSON.stringify({ cover_letter: "" }),
+  });
+  await loadApplications();
+  await loadCandidateRecommendations();
+  renderCandidateOverview(state.dashboardSummary || {});
+  renderCandidateMatchesPanel();
 }
 
 function splitList(value) {
@@ -1291,6 +1832,12 @@ async function openCandidateModal(candidateId) {
   const cvButton = candidate.cv_available
     ? `<a class="primary-btn small" href="${API_BASE}/download-cv/${candidateId}" target="_blank" rel="noreferrer">Hashli CV indir</a>`
     : `<button class="ghost-btn" type="button" disabled>CV yok</button>`;
+  const memberBadge = candidate.talentforge_member
+    ? `<span class="status-pill">TalentForge üyesi</span>`
+    : `<span class="status-pill muted">TalentForge üyesi değil</span>`;
+  const messageButton = candidate.talentforge_member && candidate.candidate_user_id && state.role === "hr"
+    ? `<button class="primary-btn small" type="button" data-message-candidate-user="${escapeHtml(candidate.candidate_user_id)}" data-message-candidate-id="${escapeHtml(candidateId)}">Mesaj at</button>`
+    : "";
 
   $(".candidate-modal-body", modal).innerHTML = `
     <div class="modal-head">
@@ -1307,6 +1854,8 @@ async function openCandidateModal(candidateId) {
     <div class="modal-actions">
       ${cvButton}
       <span class="hash-chip">hash: ${candidate.file_hash_short || "yok"}</span>
+      ${memberBadge}
+      ${messageButton}
     </div>
     <div class="modal-grid">
       <section>
@@ -1350,8 +1899,8 @@ async function openCandidateModal(candidateId) {
 }
 
 function closeCandidateModal() {
-  $(".candidate-modal:not(.job-modal)")?.classList.remove("active");
-  if (!$(".job-modal")?.classList.contains("active")) {
+  $(".candidate-modal:not(.job-modal):not(.file-preview-modal)")?.classList.remove("active");
+  if (!$(".job-modal")?.classList.contains("active") && !$(".file-preview-modal")?.classList.contains("active")) {
     document.body.classList.remove("modal-open");
   }
 }
@@ -1401,9 +1950,25 @@ function renderJobModalBody(modal, job, isLoading = false) {
       </section>
     </div>
     <div class="modal-actions">
-      <button class="primary-btn small" type="button" data-job-applications="${escapeHtml(job.id)}">${job.application_count || 0} başvuru</button>
+      ${state.role === "hr" ? `<button class="primary-btn small" type="button" data-job-applications="${escapeHtml(job.id)}">${job.application_count || 0} başvuru</button>` : ""}
+      ${state.role === "hr" ? `<button class="ghost-btn danger" type="button" data-delete-job="${escapeHtml(job.id)}">Sil</button>` : ""}
     </div>
   `;
+}
+
+async function deleteJob(jobId) {
+  if (!jobId) return;
+  await api(`/jobs/${jobId}`, { method: "DELETE" });
+  state.jobs = state.jobs.filter((job) => job.id !== jobId);
+  closeJobModal();
+  renderJobs();
+  try {
+    const summary = await api("/dashboard");
+    state.dashboardSummary = summary;
+    refreshHrDashboardSummary();
+  } catch (error) {
+    console.warn(error);
+  }
 }
 
 async function openJobApplicationsModal(jobId) {
@@ -1474,7 +2039,7 @@ function ensureJobModal() {
 }
 
 function ensureCandidateModal() {
-  let modal = $(".candidate-modal:not(.job-modal)");
+  let modal = $(".candidate-modal:not(.job-modal):not(.file-preview-modal)");
   if (modal) return modal;
   modal = document.createElement("div");
   modal.className = "candidate-modal";
@@ -1500,6 +2065,119 @@ function setSearchMode(mode) {
   });
 }
 
+function messagesRoot() {
+  return $(`[data-role-dashboard="${state.role}"] [data-messages-root]`);
+}
+
+function renderMessagesPanel() {
+  const root = messagesRoot();
+  if (!root) return;
+  const active = state.conversations.find((item) => item.id === state.activeConversationId) || state.conversations[0];
+  if (active && !state.activeConversationId) state.activeConversationId = active.id;
+  root.innerHTML = `
+    <section class="messages-list">
+      <div class="panel-title-row">
+        <h2>Mesajlar</h2>
+        ${state.messagesUnread ? `<span class="status-pill">${state.messagesUnread} yeni</span>` : ""}
+      </div>
+      ${
+        state.conversations.length
+          ? state.conversations.map((conversation) => {
+              const other = conversation.other_user || {};
+              const last = conversation.last_message?.body || "Henüz mesaj yok.";
+              return `
+                <button class="message-thread ${conversation.id === state.activeConversationId ? "active" : ""}" type="button" data-open-conversation="${escapeHtml(conversation.id)}">
+                  <strong>${escapeHtml(other.name || "Kullanıcı")}</strong>
+                  <span>${escapeHtml(last)}</span>
+                  ${conversation.unread_count ? `<b>${conversation.unread_count}</b>` : ""}
+                </button>`;
+            }).join("")
+          : `<div class="empty-state compact"><h3>Henüz mesaj yok</h3>${state.role === "hr" ? "<p>Aday profilinden mesaj başlatabilirsin.</p>" : ""}</div>`
+      }
+    </section>
+    <section class="messages-chat">
+      ${
+        active
+          ? `
+            <div class="panel-title-row">
+              <div>
+                <p class="eyebrow">Konuşma</p>
+                <h2>${escapeHtml(active.other_user?.name || "Kullanıcı")}</h2>
+              </div>
+            </div>
+            <div class="message-bubbles">
+              ${
+                state.activeMessages.length
+                  ? state.activeMessages.map((message) => `
+                    <article class="message-bubble ${message.sender_user_id === state.user?.id ? "mine" : ""}">
+                      <p>${escapeHtml(message.body)}</p>
+                    </article>
+                  `).join("")
+                  : `<p class="muted-line">Bu konuşmada henüz mesaj yok.</p>`
+              }
+            </div>
+            <form class="message-compose" data-message-compose>
+              <input name="body" type="text" placeholder="Mesaj yaz..." autocomplete="off" />
+              <button class="primary-btn small" type="submit">Gönder</button>
+            </form>`
+          : `<div class="empty-state compact"><h3>Konuşma seç</h3><p>Mesaj geçmişi burada görünecek.</p></div>`
+      }
+    </section>
+  `;
+}
+
+function updateMessageBadges() {
+  $all('[data-dash-tab="messages"]').forEach((button) => {
+    button.textContent = state.messagesUnread ? `Mesajlar (${state.messagesUnread})` : "Mesajlar";
+  });
+}
+
+async function loadMessages() {
+  const data = await api("/messages");
+  state.conversations = data.conversations || [];
+  state.messagesUnread = data.unread_count || 0;
+  updateMessageBadges();
+  if (state.activeConversationId) {
+    const exists = state.conversations.some((conversation) => conversation.id === state.activeConversationId);
+    if (!exists) state.activeConversationId = null;
+  }
+  renderMessagesPanel();
+  if (state.activeConversationId) await openConversation(state.activeConversationId);
+}
+
+async function openConversation(conversationId) {
+  state.activeConversationId = conversationId;
+  const data = await api(`/messages/${conversationId}`);
+  state.activeMessages = data.messages || [];
+  const conversation = data.conversation;
+  state.conversations = state.conversations.map((item) => item.id === conversation.id ? conversation : item);
+  state.messagesUnread = state.conversations.reduce((sum, item) => sum + (item.unread_count || 0), 0);
+  updateMessageBadges();
+  renderMessagesPanel();
+}
+
+async function sendConversationMessage(body) {
+  if (!state.activeConversationId || !body.trim()) return;
+  await api(`/messages/${state.activeConversationId}`, {
+    method: "POST",
+    body: JSON.stringify({ body }),
+  });
+  await openConversation(state.activeConversationId);
+}
+
+async function startMessageWithCandidate(candidateUserId, candidateNeo4jId) {
+  const data = await api("/messages/conversations", {
+    method: "POST",
+    body: JSON.stringify({
+      candidate_user_id: candidateUserId,
+      candidate_neo4j_id: candidateNeo4jId,
+    }),
+  });
+  state.activeConversationId = data.conversation?.id || null;
+  setDashboardTab("messages");
+  if (state.activeConversationId) await openConversation(state.activeConversationId);
+}
+
 function setupRouting() {
   document.addEventListener("click", (event) => {
     const searchModeButton = event.target.closest("[data-search-mode-button]");
@@ -1510,6 +2188,19 @@ function setupRouting() {
     const detailButton = event.target.closest("[data-candidate-detail]");
     if (detailButton) {
       openCandidateModal(detailButton.dataset.candidateDetail);
+    }
+
+    const messageCandidateButton = event.target.closest("[data-message-candidate-user]");
+    if (messageCandidateButton) {
+      startMessageWithCandidate(
+        messageCandidateButton.dataset.messageCandidateUser,
+        messageCandidateButton.dataset.messageCandidateId || ""
+      ).catch((error) => console.warn(error));
+    }
+
+    const openConversationButton = event.target.closest("[data-open-conversation]");
+    if (openConversationButton) {
+      openConversation(openConversationButton.dataset.openConversation).catch((error) => console.warn(error));
     }
 
     const saveSearchButton = event.target.closest("[data-save-current-search]");
@@ -1538,6 +2229,16 @@ function setupRouting() {
       openJobApplicationsModal(jobApplicationsButton.dataset.jobApplications);
     }
 
+    const deleteJobButton = event.target.closest("[data-delete-job]");
+    if (deleteJobButton) {
+      deleteJob(deleteJobButton.dataset.deleteJob).catch((error) => console.warn(error));
+    }
+
+    const applyJobButton = event.target.closest("[data-apply-job]");
+    if (applyJobButton) {
+      applyToJob(applyJobButton.dataset.applyJob).catch((error) => console.warn(error));
+    }
+
     const saveCandidateButton = event.target.closest("[data-save-candidate]");
     if (saveCandidateButton) {
       saveCandidate(saveCandidateButton.dataset.saveCandidate);
@@ -1548,14 +2249,54 @@ function setupRouting() {
       deleteSavedCandidate(deleteCandidateButton.dataset.deleteSavedCandidate);
     }
 
+    const uploadedFileButton = event.target.closest("[data-open-uploaded-file]");
+    if (uploadedFileButton) {
+      openUploadedFileModal(uploadedFileButton.dataset.openUploadedFile);
+    }
+
+    const cvProfileButton = event.target.closest("[data-open-cv-profile]");
+    if (cvProfileButton) {
+      openCvProfileModal(cvProfileButton.dataset.openCvProfile);
+    }
+
+    const deleteCvProfileButton = event.target.closest("[data-delete-cv-profile]");
+    if (deleteCvProfileButton) {
+      deleteCvProfile(deleteCvProfileButton.dataset.deleteCvProfile).catch((error) => console.warn(error));
+    }
+
+    const addCandidateCvButton = event.target.closest("[data-add-candidate-cv]");
+    if (addCandidateCvButton) {
+      addCandidateCvFromDashboard();
+    }
+
     const closeButton = event.target.closest("[data-modal-close]");
     if (closeButton) {
       if (closeButton.closest(".job-modal")) {
         closeJobModal();
+      } else if (closeButton.closest(".file-preview-modal")) {
+        $(".file-preview-modal")?.classList.remove("active");
+        if (!$(".job-modal")?.classList.contains("active") && !$(".candidate-modal:not(.job-modal):not(.file-preview-modal):not(.cv-profile-modal)")?.classList.contains("active")) {
+          document.body.classList.remove("modal-open");
+        }
+      } else if (closeButton.closest(".cv-profile-modal")) {
+        $(".cv-profile-modal")?.classList.remove("active");
+        if (!$(".job-modal")?.classList.contains("active") && !$(".file-preview-modal")?.classList.contains("active")) {
+          document.body.classList.remove("modal-open");
+        }
       } else {
         closeCandidateModal();
       }
     }
+  });
+
+  document.addEventListener("submit", (event) => {
+    const form = event.target.closest("[data-message-compose]");
+    if (!form) return;
+    event.preventDefault();
+    const input = form.elements.body;
+    const body = input.value;
+    input.value = "";
+    sendConversationMessage(body).catch((error) => console.warn(error));
   });
 
   $all("[data-route]").forEach((element) => {
@@ -1607,17 +2348,38 @@ function setupLandingUpload() {
   });
 }
 
+function setupCandidateCvUpload() {
+  const trigger = $("[data-candidate-cv-trigger]");
+  const input = $("#candidate-cv-input");
+  const continueButton = $("[data-candidate-setup-continue]");
+  if (trigger && input) {
+    trigger.addEventListener("click", () => input.click());
+    input.addEventListener("change", async () => {
+      try {
+        await uploadCandidateCvs(input.files);
+      } catch (error) {
+        setCandidateUploadStatus(error.message, "error");
+      } finally {
+        input.value = "";
+      }
+    });
+  }
+  continueButton?.addEventListener("click", () => {
+    commitCandidateProfiles().catch((error) => setCandidateUploadStatus(error.message, "error"));
+  });
+}
+
 function setupAuthForms() {
   $all(".auth-form").forEach((form) => {
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       const panel = form.dataset.authPanel;
       const inputs = [...form.querySelectorAll("input")];
-      setMessage("Isleniyor...");
+      setMessage("İşleniyor...");
 
       try {
         if (panel === "forgot") {
-          setMessage("Demo modunda sifre sifirlama simule edildi.");
+          setMessage("Demo modunda şifre sıfırlama simüle edildi.");
           return;
         }
 
@@ -1652,9 +2414,6 @@ function setupAuthForms() {
                 role: "candidate",
                 full_name: fullName,
                 email: roleInputs[0].value,
-                school: roleInputs[1].value,
-                profession: roleInputs[2].value,
-                experience_years: Number(roleInputs[3].value || 0),
                 password,
               };
 
@@ -1664,7 +2423,13 @@ function setupAuthForms() {
         });
         saveSession(data);
         setMessage("Hesap oluşturuldu.");
-        showView("dashboard");
+        if (state.role === "candidate") {
+          state.candidateProfiles = [];
+          persistCandidateProfiles();
+          showView("candidateSetup");
+        } else {
+          showView("dashboard");
+        }
       } catch (error) {
         setMessage(error.message, "error");
       }
@@ -1693,6 +2458,7 @@ function init() {
   setupRouting();
   setupAuthForms();
   setupLandingUpload();
+  setupCandidateCvUpload();
   setupReveal();
   syncRoleUI();
   renderSearchPanel();

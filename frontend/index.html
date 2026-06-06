@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260606-9" />
+    <link rel="stylesheet" href="./styles.css?v=20260606-17" />
   </head>
   <body>
     <div class="app-shell">
@@ -276,9 +276,6 @@
               </div>
               <div class="role-fields" data-register-role="candidate">
                 <label>E-posta<input type="email" placeholder="aday@mail.com" required /></label>
-                <label>Okul<input type="text" placeholder="Marmara Üniversitesi" /></label>
-                <label>Meslek / hedef rol<input type="text" placeholder="Backend Developer" /></label>
-                <label>Tecrübe yılı<input type="number" min="0" max="40" placeholder="2" /></label>
               </div>
               <label>Şifre<input type="password" placeholder="En az 8 karakter" required /></label>
               <button class="primary-btn full" type="submit">Hesap oluştur</button>
@@ -289,6 +286,30 @@
               <button class="primary-btn full" type="submit">Sıfırlama bağlantısı gönder</button>
             </form>
             <p class="auth-message" aria-live="polite"></p>
+          </div>
+        </section>
+
+        <section id="candidate-setup-view" class="view candidate-setup-view" aria-label="Aday CV yükleme">
+          <div class="setup-shell">
+            <div class="setup-heading">
+              <p class="eyebrow">Aday onboarding</p>
+              <h1>Özgeçmişini nasıl hazırlamak istersin?</h1>
+              <p>Birden fazla CV yükleyebilirsin. TalentForge her CV'yi işleyip ayrı profil olarak çıkarır.</p>
+            </div>
+            <div class="resume-upload-panel">
+              <input id="candidate-cv-input" type="file" accept=".pdf,.docx" multiple hidden />
+              <button class="resume-dropzone" type="button" data-candidate-cv-trigger>
+                <span class="speed-badge">Daha hızlı</span>
+                <span class="file-icon">▤</span>
+                <strong>Özgeçmiş dosyalarını yükle</strong>
+                <em>Bilgilerini otomatik dolduralım</em>
+                <small>Format: pdf, docx. Birden fazla CV seçebilirsin.</small>
+              </button>
+              <div class="uploaded-file-list" data-uploaded-file-list></div>
+            </div>
+            <div class="candidate-upload-status" data-candidate-upload-status>CV seçilmeyi bekliyor.</div>
+            <div class="candidate-profile-preview" data-candidate-profile-preview></div>
+            <button class="primary-btn setup-continue" type="button" data-candidate-setup-continue hidden>Devam et</button>
           </div>
         </section>
 
@@ -303,12 +324,14 @@
               <button class="dash-link" type="button" data-dash-tab="search">Aday arama</button>
               <button class="dash-link" type="button" data-dash-tab="jobs">İlanlar</button>
               <button class="dash-link" type="button" data-dash-tab="shortlist">Kaydedilen adaylar</button>
+              <button class="dash-link" type="button" data-dash-tab="messages">Mesajlar</button>
             </div>
             <div class="dash-menu" data-menu-role="candidate">
               <button class="dash-link active" type="button" data-dash-tab="overview">Anasayfa</button>
               <button class="dash-link" type="button" data-dash-tab="profile">Profilim</button>
               <button class="dash-link" type="button" data-dash-tab="matches">Eşleşmeler</button>
               <button class="dash-link" type="button" data-dash-tab="applications">Başvurular</button>
+              <button class="dash-link" type="button" data-dash-tab="messages">Mesajlar</button>
             </div>
             <button class="ghost-btn" type="button" data-route="landing">Çıkış</button>
           </aside>
@@ -409,6 +432,9 @@
                   <article><h3>Teklif</h3><p>Kayıt yok.</p></article>
                 </div>
               </div>
+              <div class="dashboard-panel" data-panel="messages">
+                <div class="messages-layout" data-messages-root></div>
+              </div>
             </div>
 
             <div id="candidate-dashboard" class="role-dashboard" data-role-dashboard="candidate">
@@ -479,6 +505,9 @@
                   <article><span>20 Mayıs</span><h3>Data Analyst</h3><p>Geri bildirim alındı</p></article>
                 </div>
               </div>
+              <div class="dashboard-panel" data-panel="messages">
+                <div class="messages-layout" data-messages-root></div>
+              </div>
             </div>
           </div>
         </section>
@@ -490,7 +519,7 @@
       </footer>
     </div>
 
-    <script src="./app.js?v=20260606-9"></script>
+    <script src="./app.js?v=20260606-17"></script>
   </body>
 </html>
 

@@ -49,6 +49,9 @@ class User(TimestampMixin, Base):
     organization: Mapped[Organization | None] = relationship(back_populates="users")
     hr_profile: Mapped["HRProfile | None"] = relationship(back_populates="user")
     candidate_profile: Mapped["CandidateProfile | None"] = relationship(back_populates="user")
+    sent_messages: Mapped[list["Message"]] = relationship(
+        back_populates="sender", foreign_keys="Message.sender_user_id"
+    )
 
 
 class HRProfile(TimestampMixin, Base):
@@ -82,6 +85,22 @@ class CandidateProfile(TimestampMixin, Base):
 
     user: Mapped[User] = relationship(back_populates="candidate_profile")
     applications: Mapped[list["JobApplication"]] = relationship(back_populates="candidate")
+    cv_profiles: Mapped[list["CandidateCVProfile"]] = relationship(back_populates="candidate_profile")
+
+
+class CandidateCVProfile(TimestampMixin, Base):
+    __tablename__ = "candidate_cv_profiles"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    candidate_profile_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("candidate_profiles.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    neo4j_candidate_id: Mapped[str] = mapped_column(String(120), unique=True, index=True, nullable=False)
+    file_name: Mapped[str | None] = mapped_column(String(255))
+    title: Mapped[str | None] = mapped_column(String(180))
+    summary: Mapped[str | None] = mapped_column(Text)
+
+    candidate_profile: Mapped[CandidateProfile] = relationship(back_populates="cv_profiles")
 
 
 class JobPost(TimestampMixin, Base):
@@ -177,3 +196,36 @@ class PasswordResetToken(TimestampMixin, Base):
     token_hash: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class Conversation(TimestampMixin, Base):
+    __tablename__ = "conversations"
+    __table_args__ = (
+        UniqueConstraint("hr_user_id", "candidate_user_id", name="uq_conversations_hr_candidate"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    hr_user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    candidate_user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    candidate_neo4j_id: Mapped[str | None] = mapped_column(String(120), index=True)
+    last_message_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class Message(TimestampMixin, Base):
+    __tablename__ = "messages"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    conversation_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("conversations.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    sender_user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    sender: Mapped[User] = relationship(back_populates="sent_messages", foreign_keys=[sender_user_id])
