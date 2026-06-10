@@ -19,7 +19,7 @@ from sqlalchemy import func, or_
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 from app.core.storage import upload_cv as r2_upload, download_cv as r2_download, delete_cv as r2_delete
-
+from fastapi.staticfiles import StaticFiles
 from app.core.config import get_settings
 from app.core.database import get_neo4j_driver, close_neo4j_driver
 from app.core.postgres import get_db, init_db
@@ -106,8 +106,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.mount("/ui", StaticFiles(directory="frontend", html=True), name="ui")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
+
+app.mount("/ui", StaticFiles(directory=FRONTEND_DIR, html=True), name="ui")
 
 @app.exception_handler(SQLAlchemyError)
 async def database_error_handler(request, exc):
