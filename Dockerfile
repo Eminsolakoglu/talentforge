@@ -18,9 +18,7 @@ RUN apt-get update \
 COPY pyproject.toml uv.lock README.md ./
 RUN uv sync --frozen --no-dev
 
-COPY app ./app
-COPY evaluation ./evaluation
-COPY streamlit_app.py ./
+COPY . .
 
 EXPOSE 8000
 
