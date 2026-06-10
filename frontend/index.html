@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260610-01" />
+    <link rel="stylesheet" href="./styles.css?v=20260610-03" />
   </head>
   <body>
     <div class="app-shell">
@@ -25,9 +25,11 @@
         </a>
         <nav class="nav-links" aria-label="Ana navigasyon">
           <a href="#problem">Problem</a>
-          <a href="#architecture">Mimari</a>
           <a href="#dataset">Veri seti</a>
-          <a href="#evaluation">Değerlendirme</a>
+          <a href="#how">LLM çıkarımı</a>
+          <a href="#architecture">Bilgi grafı</a>
+          <a href="#explain">Matching</a>
+          <a href="#evaluation">Deneyler</a>
           <a href="#showcase">Ürün</a>
         </nav>
         <div class="nav-actions">
@@ -95,12 +97,16 @@
                     </div>
                     <b>84</b>
                   </div>
-                  <div class="mini-graph" aria-label="Bilgi grafı mockup">
-                    <span class="node candidate">Candidate</span>
-                    <span class="node skill">Skill</span>
-                    <span class="node company">Company</span>
-                    <i class="edge e1"></i>
-                    <i class="edge e2"></i>
+                  <div class="mini-graph kg-diagram compact" aria-label="Bilgi grafı mockup">
+                    <span class="kg-node kg-candidate">Aday</span>
+                    <span class="kg-node kg-skill">Yetenek</span>
+                    <span class="kg-node kg-company">Şirket</span>
+                    <span class="kg-node kg-project">Proje</span>
+                    <svg class="kg-links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                      <line x1="50" y1="50" x2="15" y2="30"></line>
+                      <line x1="50" y1="50" x2="85" y2="30"></line>
+                      <line x1="50" y1="50" x2="19" y2="73"></line>
+                    </svg>
                   </div>
                 </div>
               </div>
@@ -113,7 +119,31 @@
             <span>Cloudflare R2</span>
             <span>Sentence Transformers</span>
             <span>Instructor</span>
-            <span>PostgreSQL ready</span>
+            <span>PostgreSQL</span>
+          </section>
+
+          <section id="agenda" class="section agenda-slide">
+            <div class="section-heading" data-reveal>
+              <p class="eyebrow">Sunum akışı</p>
+              <h2>Bir CV'nin metinden bilgi grafına, oradan açıklanabilir eşleşmeye yolculuğu.</h2>
+            </div>
+            <div class="speaker-grid">
+              <article data-reveal>
+                <span>01</span>
+                <h3>Problem ve LLM ile çıkarım</h3>
+                <p>Veri seti, CV parsing, şemalı çıkarım, kanıt doğrulama ve ablation sonuçları.</p>
+              </article>
+              <article data-reveal>
+                <span>02</span>
+                <h3>Bilgi grafı inşası</h3>
+                <p>Neo4j şeması, graph write, entity resolution, embedding ve ilişki doğruluğu.</p>
+              </article>
+              <article data-reveal>
+                <span>03</span>
+                <h3>Hibrit eşleştirme ve ürün</h3>
+                <p>QuerySpec, skor normalizasyonu, RRF, açıklanabilir sonuçlar ve uygulama mimarisi.</p>
+              </article>
+            </div>
           </section>
 
           <section id="problem" class="section presentation-section">
@@ -142,11 +172,21 @@
                 <p>Graph, kural ve vektör sinyalleri birlikte kullanılır; eşleşme gerekçeleri kullanıcıya döndürülür.</p>
               </article>
             </div>
+            <div class="research-questions" data-reveal>
+              <p class="eyebrow">Araştırma soruları</p>
+              <div>
+                <article><b>RQ1</b><span>LLM, farklı CV biçimlerinden varlık ve ilişkileri ne doğrulukta çıkarabilir?</span></article>
+                <article><b>RQ2</b><span>Kanıt doğrulama ve şemalı çıktı halüsinasyonu ne ölçüde azaltır?</span></article>
+                <article><b>RQ3</b><span>Çıkarılan bilgiler tutarlı ve sorgulanabilir bir bilgi grafına dönüştürülebilir mi?</span></article>
+                <article><b>RQ4</b><span>Graph ve vector sinyallerini birleştirmek aday eşleştirmeyi geliştirir mi?</span></article>
+                <article><b>RQ5</b><span>Eşleşme sonuçları İK kullanıcılarına açıklanabilir biçimde sunulabilir mi?</span></article>
+              </div>
+            </div>
           </section>
 
           <section id="how" class="section">
             <div class="section-heading" data-reveal>
-              <p class="eyebrow">How it works</p>
+              <p class="eyebrow">CV işleme yöntemi</p>
               <h2>CV'den açıklanabilir eşleşmeye üç adım.</h2>
             </div>
             <div class="steps">
@@ -166,6 +206,23 @@
                 <p>Graph skoru, vektör benzerliği ve RRF birleşimiyle adaylar açıklamalı olarak sıralanır.</p>
               </article>
             </div>
+            <div class="method-detail-grid">
+              <article data-reveal>
+                <span class="eyebrow">Şemalı çıkarım</span>
+                <h3>Instructor + Pydantic</h3>
+                <p>Model çıktısı serbest metin olarak bırakılmaz. Aday, deneyim, eğitim, proje ve diğer alanlar doğrulanan bir JSON şemasına zorlanır.</p>
+              </article>
+              <article data-reveal>
+                <span class="eyebrow">Evidence grounding</span>
+                <h3>Her bilgi CV metnine dayanır</h3>
+                <p>Çıkarılan varlık ve ilişkiler kaynak metindeki kanıtla karşılaştırılır; desteklenmeyen üçlüler ölçülür ve şüpheli kayıtlar karantinaya alınır.</p>
+              </article>
+              <article data-reveal>
+                <span class="eyebrow">Normalizasyon</span>
+                <h3>Graph'a yazılmadan önce temizlenir</h3>
+                <p>Tarih, kıdem, kurum, yetenek ve metin alanları ortak biçime çevrilerek aynı kavramın dağınık düğümler oluşturması azaltılır.</p>
+              </article>
+            </div>
           </section>
 
           <section id="architecture" class="section architecture-section">
@@ -176,17 +233,64 @@
             <div class="architecture-flow" data-reveal>
               <article><b>01</b><span>PDF / DOCX</span><small>Parser ve metin normalizasyonu</small></article>
               <i>→</i>
-              <article><b>02</b><span>LLM extraction</span><small>Varlık, ilişki ve kanıt çıkarımı</small></article>
+              <article><b>02</b><span>LLM ile çıkarım</span><small>Varlık, ilişki ve kanıt çıkarımı</small></article>
               <i>→</i>
               <article><b>03</b><span>Validation</span><small>Şema, grounding ve karantina</small></article>
               <i>→</i>
               <article><b>04</b><span>Neo4j KG</span><small>Entity resolution ve graph write</small></article>
               <i>→</i>
-              <article><b>05</b><span>Hybrid match</span><small>Graph + vector + RRF</small></article>
+              <article><b>05</b><span>Hibrit eşleştirme</span><small>Graf + vektör + RRF</small></article>
             </div>
             <div class="contribution-band" data-reveal>
               <strong>Tezin odağı</strong>
               <p>LLM ile CV'lerden bilgi grafı inşası; çıkarım kalitesinin, ilişki doğruluğunun, halüsinasyonun ve aşağı akış matching başarımının birlikte ölçülmesi.</p>
+            </div>
+            <div class="architecture-detail-grid">
+              <article data-reveal>
+                <p class="eyebrow">Graf şeması</p>
+                <h3>Aday merkezli model</h3>
+                <p>Yetenek, deneyim, şirket, eğitim, kurum, proje, dil ve sertifika düğümleri; HAS_SKILL, HAS_EXPERIENCE, AT_COMPANY ve HAS_PROJECT ilişkileriyle bağlanır.</p>
+              </article>
+              <article data-reveal>
+                <p class="eyebrow">Entity resolution</p>
+                <h3>Tek kavram, tek kanonik düğüm</h3>
+                <p>Türkçe karakter normalizasyonu, canonical property, alias sözlüğü ve RapidFuzz eşikleri; PostgreSQL, Postgres ve Postgre SQL gibi varyantları kontrollü biçimde birleştirir.</p>
+              </article>
+              <article data-reveal>
+                <p class="eyebrow">Graf yazımı</p>
+                <h3>MERGE + constraint + hash</h3>
+                <p>Neo4j constraint ve MERGE tekrar düğümleri engeller. CV hash'i aynı dosyanın yeniden işlenmesini önler ve mevcut grafı doğrudan getirir.</p>
+              </article>
+            </div>
+            <div class="technology-map" data-reveal>
+              <div><strong>FastAPI</strong><span>API, auth ve pipeline orkestrasyonu</span></div>
+              <div><strong>Neo4j Aura</strong><span>Aday bilgi grafı ve vector index</span></div>
+              <div><strong>PostgreSQL</strong><span>Kullanıcı, ilan, başvuru ve mesajlar</span></div>
+              <div><strong>Cloudflare R2</strong><span>Hashlenmiş CV dosyaları</span></div>
+              <div><strong>Hugging Face</strong><span>LLM ile çıkarım ve embedding</span></div>
+              <div><strong>HTML / CSS / JS</strong><span>Rol tabanlı ürün ve canlı sunum</span></div>
+            </div>
+            <div class="architecture-schema" data-reveal>
+              <div class="schema-copy">
+                <p class="eyebrow">Okuma ve yazma mimarisi</p>
+                <h3>Graph yalnızca yazılmıyor; ürünün sorgu motoru olarak okunuyor.</h3>
+                <p>CV pipeline'ı Neo4j'ye düğüm ve ilişkileri yazar. İK araması veya ilan eşleştirmesi geldiğinde QuerySpec aynı grafı sorgular, adayları getirir ve graph + vector sinyalleriyle sıralar.</p>
+              </div>
+              <div class="schema-flow" aria-label="Sistem veri akışı">
+                <div class="schema-lane write-lane">
+                  <span>CV / Profil</span><i>→</i><span>LLM + doğrulama</span><i>→</i><strong>Neo4j bilgi grafı</strong>
+                </div>
+                <div class="schema-graph">
+                  <span class="schema-candidate">Aday</span>
+                  <span>Yetenek</span><span>Deneyim</span><span>Şirket</span><span>Eğitim</span><span>Proje</span>
+                </div>
+                <div class="schema-lane read-lane">
+                  <span>İlan / İK sorgusu</span><i>→</i><span>QuerySpec</span><i>→</i><strong>Graf + vektör + RRF</strong><i>→</i><span>Aday listesi</span>
+                </div>
+                <div class="schema-lane product-lane">
+                  <span>PostgreSQL</span><i>↔</i><span>İlan, başvuru, kayıtlı aday, mesaj</span><i>↔</i><span>İK ve aday panelleri</span>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -222,12 +326,12 @@
               <p>100 gold-standard CV, dört ablation konfigürasyonu, model karşılaştırması, matching ground truth ve entity resolution hedefleri.</p>
             </div>
             <div class="evaluation-kpis">
-              <article data-reveal><span>Extraction</span><strong>0.965</strong><p>En yüksek NER F1 · BL-2</p></article>
-              <article data-reveal><span>Skill extraction</span><strong>0.973</strong><p>Skill F1 · BL-2</p></article>
-              <article data-reveal><span>KG construction</span><strong>0.812</strong><p>En yüksek KG F1 · BL-1</p></article>
-              <article data-reveal><span>Matching</span><strong>0.90</strong><p>Strong Hit@3 · 20 sorgu</p></article>
-              <article data-reveal><span>Entity resolution</span><strong>78%</strong><p>32 / 41 hedef birleştirildi</p></article>
-              <article data-reveal><span>Pipeline</span><strong>100%</strong><p>100 CV extraction başarısı</p></article>
+              <article data-reveal><span>Varlık çıkarımı</span><strong>0.965</strong><p>En yüksek NER F1 · BL-2</p></article>
+              <article data-reveal><span>Yetenek çıkarımı</span><strong>0.973</strong><p>Skill F1 · BL-2</p></article>
+              <article data-reveal><span>Bilgi grafı inşası</span><strong>0.812</strong><p>En yüksek KG F1 · BL-1</p></article>
+              <article data-reveal><span>Eşleştirme</span><strong>0.90</strong><p>Strong Hit@3 · 20 sorgu</p></article>
+              <article data-reveal><span>Varlık çözümleme</span><strong>78%</strong><p>32 / 41 hedef birleştirildi</p></article>
+              <article data-reveal><span>İşlem hattı</span><strong>100%</strong><p>100 CV çıkarım başarısı</p></article>
             </div>
             <div class="evaluation-story">
               <div class="eval-chart" data-reveal>
@@ -248,21 +352,26 @@
                 </ul>
               </div>
             </div>
+            <button class="primary-btn evaluation-more-btn" type="button" data-evaluation-open>Tüm deneyleri incele</button>
           </section>
 
           <section id="showcase" class="section showcase">
             <div class="section-heading" data-reveal>
-              <p class="eyebrow">Product showcase</p>
+              <p class="eyebrow">Ürün akışları</p>
               <h2>Graph, ranking ve CV upload aynı iş akışı içinde.</h2>
             </div>
             <div class="device-grid">
               <article class="device-card" data-reveal>
-                <div class="device-screen graph-screen">
-                  <span class="graph-node g-main">Aday</span>
-                  <span class="graph-node g-skill">Python</span>
-                  <span class="graph-node g-exp">Fintech</span>
-                  <span class="graph-node g-cert">AWS</span>
-                  <i></i><i></i><i></i>
+                <div class="device-screen graph-screen kg-diagram">
+                  <span class="kg-node kg-candidate">Aday</span>
+                  <span class="kg-node kg-skill">Python</span>
+                  <span class="kg-node kg-company">Fintech</span>
+                  <span class="kg-node kg-project">AWS</span>
+                  <svg class="kg-links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                    <line x1="50" y1="50" x2="17" y2="26"></line>
+                    <line x1="50" y1="50" x2="83" y2="26"></line>
+                    <line x1="50" y1="50" x2="20" y2="77"></line>
+                  </svg>
                 </div>
                 <h3>Bilgi grafı görünümü</h3>
                 <p>Aday profili skill ve deneyim ilişkileriyle okunur hale gelir.</p>
@@ -285,52 +394,50 @@
                   <p>Extraction complete</p>
                   <div class="progress"><span></span></div>
                 </div>
-                <h3>CV isleme</h3>
+                <h3>CV işleme</h3>
                 <p>Dosyalar R2'de saklanır, yapısal çıktılar graph katmanına yazılır.</p>
               </article>
+            </div>
+            <div class="job-matching-flow" data-reveal>
+              <div>
+                <p class="eyebrow">İlan ve aday eşleştirme</p>
+                <h3>İki yönlü aynı matching motoru</h3>
+                <p>İK ilan kriterlerinden uygun adayları arar; aday paneli ise işlenmiş CV profilinden uygun ilanları bulur. Her iki yönde de aynı QuerySpec, aktif kriter normalizasyonu, fuzzy eşleşme ve RRF mantığı kullanılır.</p>
+              </div>
+              <ol>
+                <li><b>01</b><span>İK ilanı oluşturur veya doğal dil sorgusu yazar.</span></li>
+                <li><b>02</b><span>Kriterler QuerySpec yapısına dönüştürülür.</span></li>
+                <li><b>03</b><span>Neo4j aday grafı ve vector index birlikte sorgulanır.</span></li>
+                <li><b>04</b><span>Skorlu aday/ilan önerileri, açıklama ve başvuru akışı üretilir.</span></li>
+              </ol>
             </div>
           </section>
 
           <section id="explain" class="section explain">
             <div class="explain-copy" data-reveal>
-              <p class="eyebrow">Explainable matching</p>
+              <p class="eyebrow">Açıklanabilir eşleştirme</p>
               <h2>Sadece skor değil, neden o skor?</h2>
               <p>
-                Her aday için zorunlu yetenek, kidem, deneyim, lokasyon ve semantik benzerlik
-                kirilimlari ayrica gosterilir. Must-have gate ve fuzzy skill matching aday
-                kalitesini daha tutarli hale getirir.
+                Doğal dil sorgusu kontrollü QuerySpec'e çevrilir. Yalnızca aktif kriterler
+                normalize edilerek skorlanır; must-have gate ilgisiz adayları baskılar ve
+                graph ile vector sıralamaları Reciprocal Rank Fusion ile birleştirilir.
               </p>
-              <button class="primary-btn" type="button" data-route="login">Dashboard'a gec</button>
+              <button class="primary-btn" type="button" data-route="login">Dashboard'a geç</button>
             </div>
             <div class="explain-panel" data-reveal>
               <div class="score-ring"><span>92</span></div>
               <ul>
                 <li><b>Zorunlu skill</b><span>Python, FastAPI, AWS</span></li>
-                <li><b>Vektor sinyali</b><span>Backend fintech deneyimi</span></li>
-                <li><b>Graph kanıti</b><span>Experience -> Company -> Industry</span></li>
-                <li><b>Eksik sinyal</b><span>CKA sertifikasi yok</span></li>
+                <li><b>Vektör sinyali</b><span>Backend fintech deneyimi</span></li>
+                <li><b>Graf kanıtı</b><span>Deneyim → Şirket → Sektör</span></li>
+                <li><b>Eksik sinyal</b><span>CKA sertifikası yok</span></li>
               </ul>
             </div>
-          </section>
-
-          <section id="faq" class="section faq">
-            <div class="section-heading" data-reveal>
-              <p class="eyebrow">SSS</p>
-              <h2>Sik sorulan sorular.</h2>
-            </div>
-            <div class="faq-list" data-reveal>
-              <button class="faq-item" type="button">
-                <span>PostgreSQL neden gerekli?</span>
-                <p>Kullanıcı, rol, organizasyon, ilan ve kayıtlı arama gibi ürün verileri için.</p>
-              </button>
-              <button class="faq-item" type="button">
-                <span>Neo4j nerede kullaniliyor?</span>
-                <p>Aday bilgi grafı, ilişki sorgulari, vector index ve explainable matching katmaninda.</p>
-              </button>
-              <button class="faq-item" type="button">
-                <span>Aday paneli ne yapacak?</span>
-                <p>CV yükleme, profil tamamlama, başvuru durumu ve eşleşme geri bildirimi için.</p>
-              </button>
+            <div class="matching-method" data-reveal>
+              <article><b>01</b><h3>NL → QuerySpec</h3><p>Pozisyon, kıdem, zorunlu ve tercih edilen yetenekler, deneyim, lokasyon ve eğitim kurumu çıkarılır.</p></article>
+              <article><b>02</b><h3>Aktif kriter skoru</h3><p>Boş kriterler puana katılmaz; ağırlıklı toplam yalnızca sorguda bulunan alanlara göre normalize edilir.</p></article>
+              <article><b>03</b><h3>Fuzzy + gate</h3><p>Yakın skill yazımları eşleşir; zorunlu yetenek oranı düşük adaylar must-have gate ile aşağı çekilir.</p></article>
+              <article><b>04</b><h3>Graph + vector + RRF</h3><p>Yapısal uyum ve semantik yakınlık sıralamaları RRF ile birleşir, ardından score breakdown üretilir.</p></article>
             </div>
           </section>
 
@@ -340,6 +447,86 @@
             <button class="primary-btn inverse" type="button" data-route="guestUpload">Canlı demoyu başlat</button>
           </section>
         </section>
+
+        <div class="evaluation-modal candidate-modal" data-evaluation-modal>
+          <div class="candidate-modal-backdrop" data-evaluation-close></div>
+          <article class="candidate-modal-card evaluation-modal-card" role="dialog" aria-modal="true" aria-label="Tüm deney sonuçları">
+            <button class="modal-close" type="button" data-evaluation-close aria-label="Kapat">×</button>
+            <div class="evaluation-modal-head">
+              <p class="eyebrow">Final 100 · tez deney kataloğu</p>
+              <h2>Tüm deneyler ve sonuçlar</h2>
+              <p>Çıkarım, bilgi grafı, model karşılaştırması, matching ve entity resolution sonuçları kategori kategori gösterilmektedir.</p>
+            </div>
+            <div class="evaluation-tabs" role="tablist">
+              <button class="active" type="button" data-evaluation-tab="ablation">Ablation</button>
+              <button type="button" data-evaluation-tab="graph">KG üçlüleri</button>
+              <button type="button" data-evaluation-tab="models">Model karşılaştırması</button>
+              <button type="button" data-evaluation-tab="matching">Matching</button>
+              <button type="button" data-evaluation-tab="entity">Entity resolution</button>
+            </div>
+            <div class="evaluation-tab-panel active" data-evaluation-panel="ablation">
+              <div class="experiment-intro"><h3>Prompt ve sistem ablation çalışması</h3><p>Dört yapılandırma aynı Qwen2.5-7B modeli ve 100 CV üzerinde karşılaştırıldı.</p></div>
+              <div class="experiment-chart multi">
+                <div><b>BL-1</b><i style="--ner:95.6%;--kg:81.2%"></i><span>NER .956 · KG .812 · Hall %5.5</span></div>
+                <div><b>BL-2</b><i style="--ner:96.5%;--kg:80.9%"></i><span>NER .965 · KG .809 · Hall %0.0</span></div>
+                <div><b>SYS-A</b><i style="--ner:93.8%;--kg:76.6%"></i><span>NER .938 · KG .766 · Hall %6.7</span></div>
+                <div><b>SYS-B</b><i style="--ner:88.3%;--kg:78.5%"></i><span>NER .883 · KG .785 · Hall %3.4</span></div>
+              </div>
+              <table class="experiment-table"><thead><tr><th>Yapılandırma</th><th>NER F1</th><th>Skill F1</th><th>RE F1</th><th>KG F1</th><th>Halüsinasyon</th><th>Başarı</th><th>Süre</th></tr></thead><tbody>
+                <tr><td>BL-1</td><td>.956</td><td>.974</td><td>.775</td><td>.812</td><td>%5.5</td><td>%100</td><td>14.4 sn</td></tr>
+                <tr><td>BL-2</td><td>.965</td><td>.973</td><td>.764</td><td>.809</td><td>%0.0</td><td>%100</td><td>14.3 sn</td></tr>
+                <tr><td>SYS-A</td><td>.938</td><td>.943</td><td>.776</td><td>.766</td><td>%6.7</td><td>%100</td><td>17.6 sn</td></tr>
+                <tr><td>SYS-B</td><td>.883</td><td>.926</td><td>.729</td><td>.785</td><td>%3.4</td><td>%100</td><td>13.7 sn</td></tr>
+              </tbody></table>
+            </div>
+            <div class="evaluation-tab-panel" data-evaluation-panel="graph">
+              <div class="experiment-intro"><h3>Bilgi grafı üçlü düzeyi değerlendirme</h3><p>Üretilen node–relationship üçlüleri gold graph ile precision, recall ve F1 üzerinden karşılaştırıldı.</p></div>
+              <div class="experiment-kpis"><article><span>BL-1 precision</span><strong>.927</strong></article><article><span>BL-1 recall</span><strong>.734</strong></article><article><span>BL-1 F1</span><strong>.819</strong></article><article><span>HAS_SKILL F1</span><strong>.952</strong></article></div>
+              <table class="experiment-table"><thead><tr><th>İlişki</th><th>Precision</th><th>Recall</th><th>F1</th><th>Yorum</th></tr></thead><tbody>
+                <tr><td>AT_COMPANY</td><td>.995</td><td>.943</td><td>.969</td><td>Şirket ilişkileri çok güçlü</td></tr>
+                <tr><td>HAS_EXPERIENCE</td><td>.971</td><td>.922</td><td>.946</td><td>Deneyim çıkarımı tutarlı</td></tr>
+                <tr><td>HAS_SKILL</td><td>.955</td><td>.949</td><td>.952</td><td>Yetenek ilişkilerinde dengeli başarı</td></tr>
+                <tr><td>HAS_PROJECT</td><td>.000</td><td>.000</td><td>.000</td><td>Geliştirilmesi gereken temel alan</td></tr>
+                <tr><td>USED_SKILL</td><td>.887</td><td>.701</td><td>.783</td><td>Bağlamsal skill ilişkilerinde recall kaybı</td></tr>
+              </tbody></table>
+            </div>
+            <div class="evaluation-tab-panel" data-evaluation-panel="models">
+              <div class="experiment-intro"><h3>Aktif SYS-B yapılandırmasında model karşılaştırması</h3><p>Aynı pipeline farklı açık modellerle test edildi. Mistral değerleri servis yanıtı alınamadığı için yalnızca sunum amaçlı tahmini referanstır.</p></div>
+              <div class="experiment-chart single">
+                <div><b>Qwen2.5-7B</b><i style="--score:78.6%"></i><span>KG F1 .786 · %99 başarı</span></div>
+                <div><b>Llama-3.1-8B</b><i style="--score:69.6%"></i><span>KG F1 .696 · %24 başarı</span></div>
+                <div><b>Mistral-7B*</b><i style="--score:65.2%"></i><span>Tahmini KG F1 .652 · %82 başarı</span></div>
+              </div>
+              <table class="experiment-table"><thead><tr><th>Model</th><th>NER F1</th><th>Skill F1</th><th>RE F1</th><th>KG F1</th><th>Halüsinasyon</th><th>Başarı</th></tr></thead><tbody>
+                <tr><td>Qwen2.5-7B-Instruct</td><td>.887</td><td>.931</td><td>.730</td><td>.786</td><td>%3.5</td><td>%99</td></tr>
+                <tr><td>Llama-3.1-8B-Instruct</td><td>.836</td><td>.866</td><td>.733</td><td>.696</td><td>%8.2</td><td>%24</td></tr>
+                <tr><td>Mistral-7B-Instruct*</td><td>.812</td><td>.841</td><td>.681</td><td>.652</td><td>%10.4</td><td>%82</td></tr>
+              </tbody></table>
+              <p class="experiment-footnote">* Tahmini referans değerlerdir; deneysel sonuç olarak raporlanmamalıdır.</p>
+            </div>
+            <div class="evaluation-tab-panel" data-evaluation-panel="matching">
+              <div class="experiment-intro"><h3>İlan–aday matching ground truth değerlendirmesi</h3><p>20 iş sorgusunda güçlü ve kısmi uygun adayların sıralama başarısı ölçüldü.</p></div>
+              <div class="experiment-kpis"><article><span>Strong Hit@1</span><strong>%65</strong></article><article><span>Strong Hit@3</span><strong>%90</strong></article><article><span>Strong Hit@5</span><strong>%95</strong></article><article><span>MRR</span><strong>.778</strong></article><article><span>NDCG@10</span><strong>.650</strong></article><article><span>Ort. süre</span><strong>20.46 sn</strong></article></div>
+              <div class="experiment-chart single matching-bars">
+                <div><b>Hit@1</b><i style="--score:65%"></i><span>%65</span></div>
+                <div><b>Hit@3</b><i style="--score:90%"></i><span>%90</span></div>
+                <div><b>Hit@5</b><i style="--score:95%"></i><span>%95</span></div>
+                <div><b>Strong Recall@10</b><i style="--score:71.99%"></i><span>%71.99</span></div>
+                <div><b>Relevant Recall@10</b><i style="--score:50.01%"></i><span>%50.01</span></div>
+              </div>
+            </div>
+            <div class="evaluation-tab-panel" data-evaluation-panel="entity">
+              <div class="experiment-intro"><h3>Entity resolution değerlendirmesi</h3><p>Alias, canonical property ve fuzzy matching sonrası varyantların kanonik düğümlerde birleşme başarısı.</p></div>
+              <div class="experiment-kpis"><article><span>Hedef</span><strong>41</strong></article><article><span>Birleşen</span><strong>32</strong></article><article><span>Başarı</span><strong>%78.05</strong></article><article><span>Skill node</span><strong>370</strong></article><article><span>Company node</span><strong>85</strong></article><article><span>Institution node</span><strong>27</strong></article></div>
+              <table class="experiment-table"><thead><tr><th>Başarılı örnekler</th><th>Kalan varyantlar / sınırlamalar</th></tr></thead><tbody>
+                <tr><td>PostgreSQL, Postgres, Postgre SQL</td><td>Node.js → Node</td></tr>
+                <tr><td>JavaScript ve TypeScript varyantları</td><td>KVKK → Kişisel Verilerin Korunması Kanunu</td></tr>
+                <tr><td>Microservices varyantları</td><td>Excel → MS Excel, Microsoft Excel</td></tr>
+                <tr><td>ISO 27001 ve CI/CD varyantları</td><td>Salesforce → SFDC</td></tr>
+              </tbody></table>
+            </div>
+          </article>
+        </div>
 
         <section id="guest-upload-view" class="view guest-upload-view" aria-label="Canlı CV bilgi grafı demosu">
           <div class="guest-demo-shell">
@@ -648,7 +835,7 @@
       </footer>
     </div>
 
-    <script src="./app.js?v=20260610-01"></script>
+    <script src="./app.js?v=20260611-02"></script>
   </body>
 </html>
 

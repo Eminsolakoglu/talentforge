@@ -527,14 +527,44 @@ def _find_local_cv_by_hash(file_hash: str | None) -> Path | None:
     return None
 
 
-def _find_candidate_id_by_hash(file_hash: str | None) -> str | None:
+def _find_candidate_id_by_hash(
+    file_hash: str | None,
+    original_name: str | None = None,
+) -> str | None:
     if not file_hash:
         return None
     with get_neo4j_driver().session() as session:
         record = session.run(
-            "MATCH (c:Candidate {file_hash: $hash}) RETURN c.id AS id LIMIT 1",
+            """
+            MATCH (c:Candidate {file_hash: $hash})
+            SET c.id = coalesce(c.id, $generated_id)
+            RETURN c.id AS id
+            LIMIT 1
+            """,
             hash=file_hash,
+            generated_id=str(uuid.uuid4()),
         ).single()
+        if record and record["id"]:
+            return record["id"]
+
+        # Older imports may have the original filename but no file hash.
+        # Backfill the hash after finding the exact filename so later checks are fast.
+        normalized_name = Path(original_name or "").name.strip()
+        if normalized_name:
+            record = session.run(
+                """
+                MATCH (c:Candidate)
+                WHERE toLower(coalesce(c.cv_original_name, '')) = toLower($original_name)
+                  AND coalesce(c.file_hash, '') = ''
+                SET c.file_hash = $hash,
+                    c.id = coalesce(c.id, $generated_id)
+                RETURN c.id AS id
+                LIMIT 1
+                """,
+                hash=file_hash,
+                original_name=normalized_name,
+                generated_id=str(uuid.uuid4()),
+            ).single()
     return record["id"] if record and record["id"] else None
 
 
@@ -1075,7 +1105,7 @@ async def upload_cv(file: UploadFile = File(...), db: Session = Depends(get_db))
 
     try:
         file_hash = _compute_file_hash(temp_path)
-        existing_candidate_id = _find_candidate_id_by_hash(file_hash)
+        existing_candidate_id = _find_candidate_id_by_hash(file_hash, file.filename)
         if existing_candidate_id:
             existing = await candidate_detail(existing_candidate_id, db)
             existing["cv_id"] = existing_candidate_id
@@ -1414,7 +1444,7 @@ async def candidate_detail(candidate_id: str, db: Session = Depends(get_db)):
 async def search_candidates(query: QuerySpec, db: Session = Depends(get_db)):
     """İK sorgusuna göre en uygun adayları getir"""
     try:
-        results = get_matcher().search(query, limit=10)
+        results = get_matcher().search(query, limit=100)
         return enrich_candidate_membership(results, db)
     except Exception as e:
         logger.error(f"Search error: {e}")
@@ -1467,7 +1497,7 @@ async def nl_search(body: dict, db: Session = Depends(get_db)):
 
     try:
         query_spec = get_nl_parser().parse(nl_text)
-        results = enrich_candidate_membership(get_matcher().search(query_spec, limit=10), db)
+        results = enrich_candidate_membership(get_matcher().search(query_spec, limit=100), db)
         return {
             "parsed_query": query_spec.model_dump(),
             "results": results,

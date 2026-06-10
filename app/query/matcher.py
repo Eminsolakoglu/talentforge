@@ -214,6 +214,7 @@ class CandidateMatcher:
         ]
         for candidate in scored:
             candidate.pop("_hard_gate_failed", None)
+            candidate.pop("_rank_score", None)
 
         logger.info(f"🔍 {len(scored)}/{len(candidates)} aday eşleşti")
         return scored[:limit]
@@ -752,8 +753,6 @@ class CandidateMatcher:
             parts.append(", ".join(query.must_have_skills))
         if query.nice_to_have_skills:
             parts.append(", ".join(query.nice_to_have_skills))
-        if query.education_institutions:
-            parts.append("Education institutions: " + ", ".join(query.education_institutions))
         if query.free_text:
             parts.append(query.free_text)
         return ". ".join(parts)
@@ -766,14 +765,18 @@ class CandidateMatcher:
         for name, rank in vector_ranked.items():
             rrf_scores[name] = rrf_scores.get(name, 0) + 1.0 / (k + rank)
 
-        # Orijinal skorları RRF ile ağırlıkla
+        # RRF yalnızca sıralama sinyalidir. Görünen total_score aktif
+        # kriterlerin gerçek uyumunu korur; aksi halde aynı kesin kriterleri
+        # karşılayan adaylar farklı skorlar alır.
         for candidate in scored:
             name = candidate["name"]
             rrf = rrf_scores.get(name, 0)
             graph_score = candidate["total_score"]
-            # %70 graf, %30 vektör
-            candidate["total_score"] = round(graph_score * 0.7 + rrf * 3000 * 0.3, 1)
+            candidate["_rank_score"] = graph_score * 0.7 + rrf * 3000 * 0.3
             candidate["score_breakdown"]["vector_rrf"] = round(rrf * 3000, 1)
 
-        scored.sort(key=lambda x: x["total_score"], reverse=True)
+        scored.sort(
+            key=lambda x: (x.get("_rank_score", x["total_score"]), x["total_score"]),
+            reverse=True,
+        )
         return scored

@@ -41,6 +41,14 @@ const state = {
   pending: new Map(),
 };
 
+if (state.recentSearch?.candidates?.length) {
+  state.lastCandidates = new Map(
+    state.recentSearch.candidates
+      .filter((candidate) => candidate?.candidate_id)
+      .map((candidate) => [candidate.candidate_id, candidate])
+  );
+}
+
 const views = {
   landing: document.querySelector("#landing-view"),
   guestUpload: document.querySelector("#guest-upload-view"),
@@ -802,6 +810,7 @@ function setDashboardTab(tab) {
   dashTop?.classList.toggle("is-compact", isHrSecondaryTab);
   if (topButton) topButton.hidden = state.role !== "hr" || tab !== "overview";
   updateDashboardHeader(tab);
+  if (state.role === "hr" && tab === "overview") renderRecentMatches();
   if (state.role === "hr" && tab === "shortlist") renderSavedCandidatesPanel();
   if (state.role === "candidate" && tab === "matches") {
     renderCandidateMatchesPanel();
@@ -1240,7 +1249,7 @@ function renderRecentMatches() {
         <strong>${escapeHtml(candidate.name || "Aday")}</strong>
         <p>${escapeHtml(candidate.total_score ?? "-")} skor / ${(candidate.reasons || []).slice(0, 1).map(escapeHtml).join("") || "Açıklama yok"}</p>
       </div>
-      <b>${escapeHtml(recent.mode || "KG")}</b>
+      <b>${escapeHtml(recent.mode === "text" ? "metinle" : "kategorik")}</b>
     </button>
   `).join("");
 }
@@ -2085,7 +2094,10 @@ async function openCandidateModal(candidateId) {
   $(".candidate-modal-body", modal).innerHTML = `<p class="muted-line">Aday detayı yükleniyor...</p>`;
   modal.classList.add("active");
   document.body.classList.add("modal-open");
-  const searchResult = state.lastCandidates.get(candidateId) || {};
+  const recentResult = (state.recentSearch?.candidates || []).find(
+    (candidate) => candidate.candidate_id === candidateId
+  ) || {};
+  const searchResult = state.lastCandidates.get(candidateId) || recentResult;
   const savedResult = state.savedCandidates.find((candidate) => candidate.candidate_id === candidateId) || {};
   const savedCandidatePayload = savedResult.candidate || {};
   let detail = state.candidateDetails.get(candidateId) || {};
@@ -2176,7 +2188,7 @@ async function openCandidateModal(candidateId) {
 }
 
 function closeCandidateModal() {
-  $(".candidate-modal:not(.job-modal):not(.file-preview-modal)")?.classList.remove("active");
+  $(".candidate-detail-modal")?.classList.remove("active");
   if (!$(".job-modal")?.classList.contains("active") && !$(".file-preview-modal")?.classList.contains("active")) {
     document.body.classList.remove("modal-open");
   }
@@ -2347,7 +2359,7 @@ async function openJobApplicationsModal(jobId) {
 
 function closeJobModal() {
   $(".job-modal")?.classList.remove("active");
-  if (!$(".candidate-modal:not(.job-modal)")?.classList.contains("active")) {
+  if (!$(".candidate-detail-modal")?.classList.contains("active")) {
     document.body.classList.remove("modal-open");
   }
 }
@@ -2369,10 +2381,10 @@ function ensureJobModal() {
 }
 
 function ensureCandidateModal() {
-  let modal = $(".candidate-modal:not(.job-modal):not(.file-preview-modal)");
+  let modal = $(".candidate-detail-modal");
   if (modal) return modal;
   modal = document.createElement("div");
-  modal.className = "candidate-modal";
+  modal.className = "candidate-modal candidate-detail-modal";
   modal.innerHTML = `
     <div class="candidate-modal-backdrop" data-modal-close></div>
     <article class="candidate-modal-card" role="dialog" aria-modal="true" aria-label="Aday detayı">
@@ -2859,22 +2871,102 @@ function setupReveal() {
   revealEls.forEach((el) => observer.observe(el));
 }
 
+function setupPresentationNav() {
+  const links = $all(".nav-links a[href^='#']");
+  if (!links.length) return;
+
+  links.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      const sectionId = link.getAttribute("href")?.slice(1);
+      const section = sectionId ? document.getElementById(sectionId) : null;
+      if (!section) return;
+
+      showView("landing");
+      requestAnimationFrame(() => {
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+        history.replaceState(null, "", `#${sectionId}`);
+      });
+    });
+  });
+
+  if (!("IntersectionObserver" in window)) return;
+
+  const sections = links
+    .map((link) => document.querySelector(link.getAttribute("href")))
+    .filter(Boolean);
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visible) return;
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.id}`);
+      });
+    },
+    { rootMargin: "-28% 0px -58% 0px", threshold: [0, 0.15, 0.4] }
+  );
+
+  sections.forEach((section) => observer.observe(section));
+}
+
+function setupEvaluationModal() {
+  const modal = $("[data-evaluation-modal]");
+  if (!modal) return;
+
+  const closeModal = () => {
+    modal.classList.remove("active");
+    document.body.classList.remove("modal-open");
+  };
+
+  $all("[data-evaluation-open]").forEach((button) => {
+    button.addEventListener("click", () => {
+      modal.classList.add("active");
+      document.body.classList.add("modal-open");
+    });
+  });
+  $all("[data-evaluation-close]", modal).forEach((button) => button.addEventListener("click", closeModal));
+  $all("[data-evaluation-tab]", modal).forEach((button) => {
+    button.addEventListener("click", () => {
+      const target = button.dataset.evaluationTab;
+      $all("[data-evaluation-tab]", modal).forEach((tab) => tab.classList.toggle("active", tab === button));
+      $all("[data-evaluation-panel]", modal).forEach((panel) => {
+        panel.classList.toggle("active", panel.dataset.evaluationPanel === target);
+      });
+    });
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && modal.classList.contains("active")) closeModal();
+  });
+}
+
 function init() {
   setupRouting();
   setupAuthForms();
   setupLandingUpload();
   setupCandidateCvUpload();
   setupReveal();
+  setupPresentationNav();
+  setupEvaluationModal();
   syncRoleUI();
   renderSearchPanel();
 
   const initialView = window.location.hash.replace("#", "").split("/")[0];
+  const presentationSection = document.getElementById(initialView);
   if (state.token) {
     showView("dashboard");
   } else if (initialView === "guestUpload") {
     showView("guestUpload");
   } else {
     showView("landing");
+    if (presentationSection && initialView !== "home") {
+      requestAnimationFrame(() => {
+        presentationSection.scrollIntoView({ behavior: "auto", block: "start" });
+        history.replaceState(null, "", `#${initialView}`);
+      });
+    }
   }
 }
 
